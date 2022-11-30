@@ -90,7 +90,7 @@ let data = [
 ]
 
 const Home = () => {
-    let array = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    //let array = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     const [show, setShow] = React.useState<boolean>(false)
     const [popup, setPopup] = React.useState<boolean>(false)
     const [secondPopup, setSecondPopup] = React.useState<boolean>(false)

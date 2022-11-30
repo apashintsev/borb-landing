@@ -2,8 +2,10 @@ import React from 'react'
 import { useLocation } from 'react-router'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
+import { useAppDispatch, useAppSelector } from '../hooks/redux'
 import { useOnClickOutside } from '../lib/useOnClickOutside'
 import { SelectBodyHead } from '../pages/HomePage'
+import { appSettings } from '../store/reducers/appSettingsSlice'
 let data = [
     {
         name: 'Bitcoin',
@@ -56,13 +58,10 @@ let data = [
         img: 'https://cryptologos.cc/logos/avalanche-avax-logo.svg?v=023',
     },
 ]
-interface HeaderProps {
-    setIsBurger: (arg0: boolean) => void
-    theme: any
-    changeTheme: any
-    setLangaugePopup: (arg0: boolean) => void
-}
-const Header = (props: HeaderProps) => {
+const Header = () => {
+    const { themeName } = useAppSelector((state) => state.appSettings)
+    const { changeTheme, setIsBurger, setIsLangaugePopup } = appSettings.actions
+    const dispatch = useAppDispatch()
     const [trueLocation, setTrueLocation] = React.useState(false)
     const [itemId2, setItemId2] = React.useState(0)
     const [secondPopup, setSecondPopup] = React.useState(false)
@@ -129,7 +128,9 @@ const Header = (props: HeaderProps) => {
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                     style={{ cursor: 'pointer' }}
-                    onClick={() => props.setIsBurger(true)}
+                    onClick={() =>
+                        /*props.setIsBurger(true)*/ dispatch(setIsBurger(true))
+                    }
                 >
                     <rect y="9" width="10" height="2" rx="1" fill="#23272B" />
                     <rect y="1" width="20" height="2" rx="1" fill="#23272B" />
@@ -143,10 +144,12 @@ const Header = (props: HeaderProps) => {
                 </NavLink>
             </div>
             <div className="right">
-                {props.theme === 'light' && (
+                {themeName === 'light' && (
                     <svg
                         style={{ marginRight: '24px', cursor: 'pointer' }}
-                        onClick={props.changeTheme}
+                        onClick={
+                            /*props.changeTheme*/ () => dispatch(changeTheme())
+                        }
                         width="20"
                         height="20"
                         viewBox="0 0 20 20"
@@ -157,7 +160,9 @@ const Header = (props: HeaderProps) => {
                             <path
                                 d="M19 10.8108C18.8424 12.5166 18.2022 14.1423 17.1543 15.4975C16.1065 16.8528 14.6944 17.8816 13.0832 18.4636C11.4719 19.0456 9.72832 19.1566 8.05629 18.7838C6.38426 18.411 4.85298 17.5697 3.64164 16.3584C2.43031 15.147 1.589 13.6157 1.21618 11.9437C0.843359 10.2717 0.954435 8.52805 1.53641 6.91685C2.11839 5.30564 3.1472 3.8935 4.50246 2.84567C5.85772 1.79783 7.48337 1.15764 9.18919 1C8.19048 2.35113 7.7099 4.01585 7.83485 5.69137C7.95979 7.36689 8.68197 8.94191 9.87003 10.13C11.0581 11.318 12.6331 12.0402 14.3086 12.1652C15.9842 12.2901 17.6489 11.8095 19 10.8108V10.8108Z"
                                 stroke={
-                                    props.theme.light ? '#C2C5CC' : '#8A8F99'
+                                    themeName === 'light'
+                                        ? '#C2C5CC'
+                                        : '#8A8F99'
                                 }
                                 strokeWidth="1.4"
                                 strokeLinecap="round"
@@ -171,12 +176,14 @@ const Header = (props: HeaderProps) => {
                         </defs>
                     </svg>
                 )}
-                {props.theme === 'dark' && (
+                {themeName === 'dark' && (
                     <img
                         src="/images/primary/sun.svg"
                         alt=""
                         style={{ marginRight: '24px', cursor: 'pointer' }}
-                        onClick={props.changeTheme}
+                        onClick={
+                            /*props.changeTheme*/ () => dispatch(changeTheme())
+                        }
                     />
                 )}
 
@@ -188,12 +195,18 @@ const Header = (props: HeaderProps) => {
                     xmlns="http://www.w3.org/2000/svg"
                     className="adaptive"
                     style={{ cursor: 'pointer' }}
-                    onClick={() => props.setLangaugePopup(true)}
+                    onClick={() =>
+                        /* props.setLangaugePopup(true)*/ dispatch(
+                            setIsLangaugePopup(true)
+                        )
+                    }
                 >
                     <g clipPath="url(#clip0_184_577)">
                         <path
                             d="M19 10C19 12.3869 18.0518 14.6761 16.364 16.364C14.6761 18.0518 12.3869 19 10 19M19 10C19 7.61305 18.0518 5.32387 16.364 3.63604C14.6761 1.94821 12.3869 1 10 1M19 10H1M10 19C7.61305 19 5.32387 18.0518 3.63604 16.364C1.94821 14.6761 1 12.3869 1 10M10 19C11.657 19 13 14.97 13 10C13 5.03 11.657 1 10 1M10 19C8.343 19 7 14.97 7 10C7 5.03 8.343 1 10 1M10 1C7.61305 1 5.32387 1.94821 3.63604 3.63604C1.94821 5.32387 1 7.61305 1 10"
-                            stroke={props.theme.light ? '#C2C5CC' : '#8A8F99'}
+                            stroke={
+                                themeName === 'light' ? '#C2C5CC' : '#8A8F99'
+                            }
                             strokeWidth="1.4"
                             strokeLinecap="round"
                             strokeLinejoin="round"

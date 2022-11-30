@@ -2,6 +2,8 @@ import styled from 'styled-components'
 import React from 'react'
 import { useNavigate } from 'react-router'
 import { useOnClickOutside } from '../lib/useOnClickOutside'
+import { useAppDispatch, useAppSelector } from '../hooks/redux'
+import { appSettings } from '../store/reducers/appSettingsSlice'
 
 const data = [
     {
@@ -61,14 +63,12 @@ const data = [
     },
 ]
 
-const LangaugePopup = (props: any) => {
-
-    useOnClickOutside(props.ref, () => props.set(false))
-
-    const navigate = useNavigate()
+const LangaugePopup = () => {
+    const { setIsLangaugePopup } = appSettings.actions
+    const dispatch = useAppDispatch()
 
     return (
-        <StyledPopup ref={props.ref}>
+        <StyledPopup>
             <div className="head">
                 <h4 className="title">Change language</h4>
                 <svg
@@ -78,7 +78,7 @@ const LangaugePopup = (props: any) => {
                     x="0px"
                     y="0px"
                     viewBox="0 0 512 512"
-                    onClick={() => props.set(false)}
+                    onClick={() => dispatch(setIsLangaugePopup(false))}
                 >
                     <g>
                         <g>
@@ -104,7 +104,6 @@ const LangaugePopup = (props: any) => {
                     <g></g>
                     <g></g>
                 </svg>
-
             </div>
 
             <div className="grid">
@@ -112,7 +111,7 @@ const LangaugePopup = (props: any) => {
                     <div
                         key={card.short}
                         className="card"
-                        onClick={() => props.set(false)}
+                        onClick={() => dispatch(setIsLangaugePopup(false))}
                     >
                         <img className="card_img" src={card.url} alt="" />
                         <p>

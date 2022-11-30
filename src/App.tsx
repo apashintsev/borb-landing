@@ -8,78 +8,19 @@ import AboutPage from './pages/AboutPage'
 import EarnPage from './pages/EarnPage'
 import HomePage from './pages/HomePage'
 import { SupplyPage } from './pages/SupplyPage'
-import { useLocation } from 'react-router'
 
 //@ts-ignore
-import isEqual from 'lodash.isequal'
 import LangaugePopup from './components/LanguagePopup'
-
-export const lightTheme = {
-    backgroundContent: '#ffffff',
-    titleColor: '#23272B',
-    borderColor: '#e9ecf2',
-    subtitleColor: ' #8A8F99',
-    tabBorderColor: '#E9ECF2',
-    selectColor: '#23272B',
-    inputPlaceholderColor: '#C2C5CC',
-    navbarBg: '#fff',
-    inputWrapperColor: '#ffffff',
-    inputWrapperDisabledColor: '#F6F8FC',
-    inputBorderColor: '#E9ECF2',
-    inputDisabledBorderColor: '#F6F8FC',
-    arrowBackgroundColor: '#23272B',
-    faqColor: '#23272B',
-    faqBorderColor: '#E9ECF2',
-    faqCrossColor: '#23272B',
-    homePageButton: '#E9ECF2',
-    navbarBottom: '#C2C5CC',
-    walletBorder: '#E9ECF2',
-    navbarHoverFill: '#23272B',
-    navbarHover: '#F6F8FC',
-    black: '#23272B',
-}
-
-export const darkTheme = {
-    black: '#fff',
-    backgroundContent: '#23272B',
-    borderColor: '#3D424D',
-    titleColor: '#F6F8FC',
-    subtitleColor: '#8A8F99',
-    tabBorderColor: '#3D424D',
-    selectColor: '#F6F8FC',
-    inputPlaceholderColor: '#8A8F99',
-    navbarBg: '#16191C',
-    inputWrapperColor: '#16191C',
-    inputBorderColor: '#3D424D',
-    inputDisabledBorderColor: '#30373C',
-    inputWrapperDisabledColor: '#30373C',
-    arrowBackgroundColor: '#F6F8FC',
-    faqColor: '#F6F8FC',
-    faqBorderColor: '#3D424D',
-    faqCrossColor: '#8A8F99',
-    homePageButton: '#3D424D',
-    navbarBottom: '#3D424D',
-    walletBorder: '#3D424D',
-    navbarHover: '#30373C',
-    navbarHoverFill: '#F6F8FC',
-}
+import { useAppSelector } from './hooks/redux'
 
 const App = () => {
-    const [isBurger, setIsBurger] = useState(false)
-    const [isLangaugePopup, setIsLangaugePopup] = useState(false)
+    const { themeName, themeSettings, isBurger, isLangaugePopup } =
+        useAppSelector((state) => state.appSettings)
+    //const [isBurger, setIsBurger] = useState(false)
+    //const [isLangaugePopup, setIsLangaugePopup] = useState(false)
     let ref = useRef()
 
-    const [appTheme, setAppTheme] = useState(
-        localStorage.getItem('appTheme') === 'light' ? lightTheme : darkTheme
-    )
-
     const appRef = useRef<HTMLDivElement | null>(null)
-
-    const changeTheme = () => {
-        setAppTheme((prev) =>
-            isEqual(prev, lightTheme) ? darkTheme : lightTheme
-        )
-    }
 
     useEffect(() => {
         if (isBurger) {
@@ -93,34 +34,20 @@ const App = () => {
     }, [isBurger])
 
     useEffect(() => {
-        localStorage.setItem(
-            'appTheme',
-            appTheme.backgroundContent === '#ffffff' ? 'light' : 'dark'
-        )
-    }, [appTheme])
+        localStorage.setItem('appTheme', themeName)
+    }, [themeName])
 
     return (
-        <ThemeProvider theme={appTheme}>
+        <ThemeProvider theme={themeSettings}>
             <div className="App" id="app" ref={appRef}>
                 <Nav
-                    isBurger={isBurger}
+                /*isBurger={isBurger}
                     setIsBurger={setIsBurger}
-                    set={setIsLangaugePopup}
+                    set={setIsLangaugePopup}*/
                 />
                 <MainContainer>
-                    <Header
-                        theme={
-                            appTheme.backgroundContent === '#ffffff'
-                                ? 'light'
-                                : 'dark'
-                        }
-                        setIsBurger={setIsBurger}
-                        changeTheme={changeTheme}
-                        setLangaugePopup={setIsLangaugePopup}
-                    />
-                    {isLangaugePopup && (
-                        <LangaugePopup set={setIsLangaugePopup} ref={ref} />
-                    )}
+                    <Header />
+                    {isLangaugePopup && <LangaugePopup />}
                     <Routes>
                         <Route path="/" element={<HomePage />} />
                         <Route path="/supply" element={<SupplyPage />} />

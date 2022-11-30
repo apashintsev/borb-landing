@@ -1,5 +1,4 @@
 import React, { useMemo, useRef } from 'react'
-import styled from 'styled-components'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Faq } from '../../components/Faq'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
