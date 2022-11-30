@@ -9,7 +9,7 @@ const Footer = () => {
                 <img src="/images/primary/github.svg" alt="" />
                 <img src="/images/primary/redit.svg" alt="" />
             </div>
-            <p>© 2022 BorB | Privacy Policy</p>
+            <p>© {new Date().getFullYear()} BorB | Privacy Policy</p>
         </StyledFooter>
     )
 }

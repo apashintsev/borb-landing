@@ -3,7 +3,13 @@ import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { useOnClickOutside } from '../lib/useOnClickOutside'
 
-const Nav = (props) => {
+interface NavProps {
+    setIsBurger: (arg0: boolean) => void
+    isBurger: boolean
+    set: (arg0: boolean) => void
+}
+
+const Nav = (props: NavProps) => {
     let ref = React.useRef()
 
     useOnClickOutside(ref, () => props.setIsBurger(false))
@@ -42,7 +48,7 @@ const Nav = (props) => {
                     <NavLink
                         className="need"
                         to="/earn"
-                        onClick={() => props.isBurger(false)}
+                        onClick={() => props.setIsBurger(false)}
                     >
                         <svg
                             width="20"
@@ -64,7 +70,7 @@ const Nav = (props) => {
                     <NavLink
                         className="need"
                         to="/supply"
-                        onClick={() => props.isBurger(false)}
+                        onClick={() => props.setIsBurger(false)}
                     >
                         <svg
                             width="20"
@@ -89,7 +95,7 @@ const Nav = (props) => {
                     <NavLink
                         className="need"
                         to="/messages"
-                        onClick={() => props.isBurger(false)}
+                        onClick={() => props.setIsBurger(false)}
                     >
                         <svg
                             width="20"
@@ -111,7 +117,7 @@ const Nav = (props) => {
                     <NavLink
                         className="need"
                         to="/settings"
-                        onClick={() => props.isBurger(false)}
+                        onClick={() => props.setIsBurger(false)}
                     >
                         <svg
                             width="20"
@@ -140,7 +146,7 @@ const Nav = (props) => {
                 </Block>
                 <Block>
                     <Title>About</Title>
-                    <StyledLink stroke="true">
+                    <StyledLink stroke={true}>
                         <svg
                             width="20"
                             height="20"
@@ -295,13 +301,18 @@ const Language = styled.div`
     }
 `
 
-const StyledNav = styled.div`
+const StyledNav = styled.div<{
+    theme?: any | null
+    isBurger: boolean
+    stroke?: boolean | null
+    ref: any
+}>`
     width: 100%;
     display: flex;
     flex-direction: column;
     min-height: 100%;
     padding-bottom: 24px;
-    background: ${(props) => props.theme.navbarBg};
+    background: ${({ theme }) => theme.navbarBg};
     box-shadow: 6px 0px 16px rgba(10, 31, 51, 0.05);
     transition: 0.5s all ease;
     transform: translateX(0);
@@ -312,8 +323,8 @@ const StyledNav = styled.div`
         position: fixed;
         z-index: 10;
         left: 0;
-        transform: ${(props) =>
-            props.isBurger ? 'translateX(0)' : 'translateX(-240px)'};
+        transform: ${({ isBurger }) =>
+            isBurger ? 'translateX(0)' : 'translateX(-240px)'};
     }
 
     a.colored {
@@ -340,8 +351,8 @@ const StyledNav = styled.div`
 
         &.active {
             path {
-                stroke: ${(props) => (props.stroke ? 'var(--pink)' : 'none')};
-                fill: ${(props) => (props.stroke ? 'none' : 'var(--pink)')};
+                stroke: ${({ stroke }) => (stroke ? 'var(--pink)' : 'none')};
+                fill: ${({ stroke }) => (stroke ? 'none' : 'var(--pink)')};
                 transition: 0.2s all ease;
             }
             p {
@@ -360,13 +371,13 @@ const StyledNav = styled.div`
 
         &:hover {
             transition: 0.2s all ease;
-            background: ${(props) => props.theme.navbarHover};
+            background: ${({ theme }) => theme.navbarHover};
             border-radius: 8px;
             path {
-                stroke: ${(props) =>
-                    props.stroke ? props.theme.navbarHoverFill : 'none'};
-                fill: ${(props) =>
-                    props.stroke ? 'none' : props.theme.navbarHoverFill};
+                stroke: ${({ theme, stroke }) =>
+                    stroke ? theme.navbarHoverFill : 'none'};
+                fill: ${({ theme, stroke }) =>
+                    stroke ? 'none' : theme.navbarHoverFill};
                 transition: 0.2s all ease;
             }
             p {
@@ -425,7 +436,7 @@ const Title = styled.h4`
     }
 `
 
-const StyledLink = styled.div`
+const StyledLink = styled.div<{ theme?: any; stroke?: boolean }>`
     cursor: pointer;
     height: 48px;
     display: flex;
@@ -445,14 +456,14 @@ const StyledLink = styled.div`
         background: ${(props) => props.theme.navbarHover};
         border-radius: 8px;
         path {
-            stroke: ${(props) =>
-                props.stroke ? props.theme.navbarHoverFill : 'none'};
-            fill: ${(props) =>
-                props.stroke ? 'none' : props.theme.navbarHoverFill};
+            stroke: ${({ theme, stroke }) =>
+                stroke ? theme.navbarHoverFill : 'none'};
+            fill: ${({ theme, stroke }) =>
+                stroke ? 'none' : theme.navbarHoverFill};
             transition: 0.2s all ease;
         }
         p {
-            color: ${(props) => props.theme.navbarHoverFill};
+            color: ${({ theme }) => theme.navbarHoverFill};
             font-weight: 600;
             transition: 0.2s all ease;
         }

@@ -56,7 +56,13 @@ let data = [
         img: 'https://cryptologos.cc/logos/avalanche-avax-logo.svg?v=023',
     },
 ]
-const Header = (props) => {
+interface HeaderProps {
+    setIsBurger: (arg0: boolean) => void
+    theme: any
+    changeTheme: any
+    setLangaugePopup: (arg0: boolean) => void
+}
+const Header = (props: HeaderProps) => {
     const [trueLocation, setTrueLocation] = React.useState(false)
     const [itemId2, setItemId2] = React.useState(0)
     const [secondPopup, setSecondPopup] = React.useState(false)
@@ -225,13 +231,13 @@ const Header = (props) => {
 
 export default Header
 
-const StyledHeader = styled.header`
+const StyledHeader = styled.header<{ location: boolean }>`
     position: relative;
     display: flex;
     align-items: center;
-    justify-content: ${(props) =>
-        props.location ? 'space-between' : 'flex-start'};
-    margin: ${(props) => (props.location ? '28px 0' : '28px 0 28px auto')};
+    justify-content: ${({ location }) =>
+        location ? 'space-between' : 'flex-start'};
+    margin: ${({ location }) => (location ? '28px 0' : '28px 0 28px auto')};
     .left {
         display: none;
     }
@@ -250,7 +256,8 @@ const StyledHeader = styled.header`
         }
         h4 {
             font-weight: 600;
-            font-size: 36px; text-transform: uppercase;
+            font-size: 36px;
+            text-transform: uppercase;
             color: ${(props) => props.theme.arrowBackgroundColor};
         }
         path {
