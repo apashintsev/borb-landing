@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef} from 'react'
 import { Route, Routes } from 'react-router-dom'
 import styled, { ThemeProvider } from 'styled-components'
 import Footer from './components/Footer'
@@ -16,9 +16,6 @@ import { useAppSelector } from './hooks/redux'
 const App = () => {
     const { themeName, themeSettings, isBurger, isLangaugePopup } =
         useAppSelector((state) => state.appSettings)
-    //const [isBurger, setIsBurger] = useState(false)
-    //const [isLangaugePopup, setIsLangaugePopup] = useState(false)
-    let ref = useRef()
 
     const appRef = useRef<HTMLDivElement | null>(null)
 
@@ -40,11 +37,7 @@ const App = () => {
     return (
         <ThemeProvider theme={themeSettings}>
             <div className="App" id="app" ref={appRef}>
-                <Nav
-                /*isBurger={isBurger}
-                    setIsBurger={setIsBurger}
-                    set={setIsLangaugePopup}*/
-                />
+                <Nav />
                 <MainContainer>
                     <Header />
                     {isLangaugePopup && <LangaugePopup />}

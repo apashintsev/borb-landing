@@ -1,8 +1,5 @@
 import styled from 'styled-components'
-import React from 'react'
-import { useNavigate } from 'react-router'
-import { useOnClickOutside } from '../lib/useOnClickOutside'
-import { useAppDispatch, useAppSelector } from '../hooks/redux'
+import { useAppDispatch} from '../hooks/redux'
 import { appSettings } from '../store/reducers/appSettingsSlice'
 
 const data = [

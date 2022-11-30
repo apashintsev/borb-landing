@@ -1,68 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { ThemeName, ThemeSettings } from '../../types/App/theme'
-
-export const initialState = {
-    isBurger: false,
-    isLangaugePopup: false,
-    themeName: 'dark' as ThemeName,
-    themeSettings: {
-        black: '#fff',
-        backgroundContent: '#23272B',
-        borderColor: '#3D424D',
-        titleColor: '#F6F8FC',
-        subtitleColor: '#8A8F99',
-        tabBorderColor: '#3D424D',
-        selectColor: '#F6F8FC',
-        inputPlaceholderColor: '#8A8F99',
-        navbarBg: '#16191C',
-        inputWrapperColor: '#16191C',
-        inputBorderColor: '#3D424D',
-        inputDisabledBorderColor: '#30373C',
-        inputWrapperDisabledColor: '#30373C',
-        arrowBackgroundColor: '#F6F8FC',
-        faqColor: '#F6F8FC',
-        faqBorderColor: '#3D424D',
-        faqCrossColor: '#8A8F99',
-        homePageButton: '#3D424D',
-        navbarBottom: '#3D424D',
-        walletBorder: '#3D424D',
-        navbarHover: '#30373C',
-        navbarHoverFill: '#F6F8FC',
-    } as ThemeSettings,
-}
-//export type AppType = typeof initialState
-
-export const appSettings = createSlice({
-    name: 'appSettings',
-    initialState,
-    reducers: {
-        changeTheme(state) {
-            if (state.themeName === 'light') {
-                state.themeName = 'dark'
-                state.themeSettings = darkTheme
-            } else {
-                state.themeName = 'light'
-                state.themeSettings = lightTheme
-            }
-        },
-        setIsBurger(state, action: PayloadAction<boolean>) {
-            state.isBurger = action.payload
-        },
-        setIsLangaugePopup(state, action: PayloadAction<boolean>) {
-            state.isLangaugePopup = action.payload
-        },
-        /*setNetwork(
-            state,
-            action: PayloadAction<{ network: Web3ProviderState['network'] }>
-        ) {
-            state.network = action.payload.network
-        },
-        resetWeb3Provider(state) {},*/
-    },
-})
-
-export default appSettings.reducer
-
 export const lightTheme: ThemeSettings = {
     backgroundContent: '#ffffff',
     titleColor: '#23272B',
@@ -112,3 +49,43 @@ export const darkTheme: ThemeSettings = {
     navbarHover: '#30373C',
     navbarHoverFill: '#F6F8FC',
 }
+export const initialState = {
+    isBurger: false,
+    isLangaugePopup: false,
+    themeName: (localStorage.getItem('appTheme') ?? 'dark') as ThemeName,
+    themeSettings: (localStorage.getItem('appTheme') === 'light'
+        ? lightTheme
+        : darkTheme) as ThemeSettings,
+}
+//export type AppType = typeof initialState
+
+export const appSettings = createSlice({
+    name: 'appSettings',
+    initialState,
+    reducers: {
+        changeTheme(state) {
+            if (state.themeName === 'light') {
+                state.themeName = 'dark'
+                state.themeSettings = darkTheme
+            } else {
+                state.themeName = 'light'
+                state.themeSettings = lightTheme
+            }
+        },
+        setIsBurger(state, action: PayloadAction<boolean>) {
+            state.isBurger = action.payload
+        },
+        setIsLangaugePopup(state, action: PayloadAction<boolean>) {
+            state.isLangaugePopup = action.payload
+        },
+        /*setNetwork(
+            state,
+            action: PayloadAction<{ network: Web3ProviderState['network'] }>
+        ) {
+            state.network = action.payload.network
+        },
+        resetWeb3Provider(state) {},*/
+    },
+})
+
+export default appSettings.reducer

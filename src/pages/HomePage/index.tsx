@@ -30,6 +30,7 @@ import {
 import { Pagination, Title } from './components/bottom'
 import { useOnClickOutside } from '../../lib/useOnClickOutside'
 import { list, smallList } from '../../lib/data'
+import { v4 as uuidv4 } from 'uuid'
 // import {
 //     getPythProgramKeyForCluster,
 //     PriceStatus,
@@ -131,6 +132,7 @@ const Home = () => {
                         <SelectBodyHead ref={ref3}>
                             {list.map((item, index) => (
                                 <div
+                                    key={uuidv4()}
                                     className="select_card"
                                     onClick={() => {
                                         setItemId2(index)
@@ -192,6 +194,7 @@ const Home = () => {
                                         <SelectBody ref={ref2}>
                                             {smallList.map((item, index) => (
                                                 <div
+                                                    key={uuidv4()}
                                                     className="select_card"
                                                     onClick={() => {
                                                         setItemId(index)
@@ -289,7 +292,7 @@ const Home = () => {
                     </DataHeader>
                     <DataContent>
                         {data.slice(0, 10).map((_, idx) => (
-                            <DataContentItem>
+                            <DataContentItem key={uuidv4()}>
                                 <span className="center mobile-display-none">
                                     <img
                                         src="/images/home/bitcoin.svg"
