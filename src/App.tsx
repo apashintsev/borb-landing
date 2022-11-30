@@ -12,6 +12,9 @@ import { SupplyPage } from './pages/SupplyPage'
 //@ts-ignore
 import LangaugePopup from './components/LanguagePopup'
 import { useAppSelector } from './hooks/redux'
+import { Web3ContextProvider } from './context/Web3Context'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const App = () => {
     const { themeName, themeSettings, isBurger, isLangaugePopup } =
@@ -35,22 +38,35 @@ const App = () => {
     }, [themeName])
 
     return (
-        <ThemeProvider theme={themeSettings}>
-            <div className="App" id="app" ref={appRef}>
-                <Nav />
-                <MainContainer>
-                    <Header />
-                    {isLangaugePopup && <LangaugePopup />}
-                    <Routes>
-                        <Route path="/" element={<HomePage />} />
-                        <Route path="/supply" element={<SupplyPage />} />
-                        <Route path="/about" element={<AboutPage />} />
-                        <Route path="/earn" element={<EarnPage />} />
-                    </Routes>
-                </MainContainer>
-                <Footer />
-            </div>
-        </ThemeProvider>
+        <Web3ContextProvider>
+            <ThemeProvider theme={themeSettings}>
+                <div className="App" id="app" ref={appRef}>
+                    <Nav />
+                    <MainContainer>
+                        <Header />
+                        {isLangaugePopup && <LangaugePopup />}
+                        <Routes>
+                            <Route path="/" element={<HomePage />} />
+                            <Route path="/supply" element={<SupplyPage />} />
+                            <Route path="/about" element={<AboutPage />} />
+                            <Route path="/earn" element={<EarnPage />} />
+                        </Routes>
+                    </MainContainer>
+                    <Footer />
+                    <ToastContainer
+                        position="bottom-right"
+                        autoClose={10000}
+                        hideProgressBar={false}
+                        newestOnTop={false}
+                        closeOnClick
+                        rtl={false}
+                        pauseOnFocusLoss
+                        draggable
+                        pauseOnHover
+                    />
+                </div>
+            </ThemeProvider>
+        </Web3ContextProvider>
     )
 }
 
