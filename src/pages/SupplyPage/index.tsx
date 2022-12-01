@@ -7,7 +7,7 @@ import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useRef, useState } from 'react'
 import { SelectBody } from '../HomePage'
 import { useOnClickOutside } from '../../lib/useOnClickOutside'
-import { smallList } from '../../lib/data'
+import { allowedAssets } from '../../lib/data'
 
 const SupplyPage = () => {
     const isMobile = useMediaQuery('(max-width: 768px)')
@@ -46,9 +46,12 @@ const SupplyPage = () => {
                                 }}
                             >
                                 <CurrencyWrapper>
-                                    <img src={smallList[itemId].img} alt="" />
+                                    <img
+                                        src={allowedAssets[itemId].img}
+                                        alt=""
+                                    />
                                 </CurrencyWrapper>
-                                <span>{smallList[itemId].name}</span>
+                                <span>{allowedAssets[itemId].name}</span>
                                 <svg
                                     width="16"
                                     height="16"
@@ -65,7 +68,7 @@ const SupplyPage = () => {
                             </SelectWrapper>
                             {popup && (
                                 <SelectBody ref={reff}>
-                                    {smallList.map((item, index) => (
+                                    {allowedAssets.map((item, index) => (
                                         <div
                                             className="select_card"
                                             onClick={() => {
@@ -94,7 +97,7 @@ const SupplyPage = () => {
                             <SelectWrapper>
                                 <CurrencyWrapper>
                                     {itemId === 0 ? (
-                                        <img src={smallList[0].img} />
+                                        <img src={allowedAssets[0].img} />
                                     ) : (
                                         <svg
                                             width="20"
@@ -136,7 +139,7 @@ const SupplyPage = () => {
                 {!isMobile && (
                     <SettingsTitle margin="24px">Balance: 263</SettingsTitle>
                 )}
-                <Btn>Supply {smallList[itemId].name.toUpperCase()}</Btn>
+                <Btn>Supply {allowedAssets[itemId].name.toUpperCase()}</Btn>
                 <PurchaseWrapper>
                     <PurchaseDataList>
                         <PurchaseDataItem>

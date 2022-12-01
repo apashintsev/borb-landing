@@ -61,7 +61,7 @@ let data = [
     },
 ]
 const Header = () => {
-    const { web3Provider, address } = useWeb3Context()
+    const { address } = useWeb3Context()
     const { themeName } = useAppSelector((state) => state.appSettings)
     const { changeTheme, setIsBurger, setIsLangaugePopup } = appSettings.actions
     const dispatch = useAppDispatch()

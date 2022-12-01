@@ -1,7 +1,15 @@
-export let list = [
+import { Asset, CurrencyTicker } from '../@types/Game/game'
+
+interface AllowedCurrencies {
+    name: string
+    ticker: CurrencyTicker
+    img: string
+}
+
+export let allowedCurrencies: AllowedCurrencies[] = [
     {
         name: 'Bitcoin',
-        ticker: 'btc',
+        ticker: 'BTC',
         img: '/images/home/bitcoin.svg',
     },
     {
@@ -51,13 +59,18 @@ export let list = [
     },
 ]
 
-export let smallList = [
+interface AllowedAssets {
+    name: Asset
+    img: string
+}
+
+export const allowedAssets: AllowedAssets[] = [
     {
-        name: 'usdt',
+        name: 'USDT',
         img: '/images/earn/usdt_logo.svg',
     },
     {
-        name: 'usdc',
+        name: 'USDC',
         img: '/images/earn/usdc_logo.svg',
     },
 ]

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { ThemeName, ThemeSettings } from '../../types/App/theme'
+import { ThemeName, ThemeSettings } from '../../@types/App/theme'
 export const lightTheme: ThemeSettings = {
     backgroundContent: '#ffffff',
     titleColor: '#23272B',

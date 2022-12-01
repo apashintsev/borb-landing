@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import {
     CurrencyWrapper,
@@ -29,8 +29,14 @@ import {
 } from './components/main'
 import { Pagination, Title } from './components/bottom'
 import { useOnClickOutside } from '../../lib/useOnClickOutside'
-import { list, smallList } from '../../lib/data'
+import { allowedAssets } from '../../lib/data'
 import { v4 as uuidv4 } from 'uuid'
+import { useAppDispatch, useAppSelector } from '../../hooks/redux'
+import { gameSlice } from '../../store/reducers/gameSlice'
+import { Timeframes } from './components/timeframes'
+import SelectCurrency from './components/selectCurrency'
+import { BetCard } from './components/BetCard'
+import { Chart } from './components/Chart'
 // import {
 //     getPythProgramKeyForCluster,
 //     PriceStatus,
@@ -92,175 +98,30 @@ let data = [
 
 const Home = () => {
     //let array = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+    const { selectedAsset, selectedAssetImg, currentRewardPercent } =
+        useAppSelector((state) => state.gameSlice)
+    const { changeAsset } = gameSlice.actions
+    const dispatch = useAppDispatch()
     const [show, setShow] = React.useState<boolean>(false)
     const [popup, setPopup] = React.useState<boolean>(false)
-    const [secondPopup, setSecondPopup] = React.useState<boolean>(false)
-    const [itemId, setItemId] = React.useState<any>(0)
-    const [itemId2, setItemId2] = React.useState<any>(0)
     let ref = React.useRef(null)
     let ref2 = React.useRef(null)
-    let ref3 = React.useRef(null)
     useOnClickOutside(ref, () => setShow(false))
     useOnClickOutside(ref2, () => setPopup(false))
-    useOnClickOutside(ref3, () => setSecondPopup(false))
+
+    useEffect(() => {
+        //request data from contract
+    }, [selectedAsset])
+
+
 
     return (
         <StyledHome>
             <div className="container">
-                <div className="btc_wrapper">
-                    <div className="btc" onClick={() => setSecondPopup(true)}>
-                        <img
-                            src={list[itemId2].img}
-                            alt=""
-                            className="currency"
-                        />
-                        <h4>{list[itemId2].ticker}</h4>
-                        <svg
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
-                            <path
-                                d="M12 15L7.5 9L16.5 9L12 15Z"
-                                fill="#23272B"
-                            />
-                        </svg>
-                    </div>{' '}
-                    {secondPopup && (
-                        <SelectBodyHead ref={ref3}>
-                            {list.map((item, index) => (
-                                <div
-                                    key={uuidv4()}
-                                    className="select_card"
-                                    onClick={() => {
-                                        setItemId2(index)
-                                        setSecondPopup(false)
-                                    }}
-                                >
-                                    <img src={item.img} alt="" />
-                                    <p>{item.name}</p>
-                                </div>
-                            ))}
-                        </SelectBodyHead>
-                    )}
-                </div>
+                <SelectCurrency />
                 <Row>
-                    <Left>
-                        <div className="left_row">
-                            <p className="cost">$24,372.83</p>
-                            <div className="times">
-                                <p className="time">1m</p>
-                                <p className="time">5m</p>
-                                <p className="time active">15m</p>
-                                <p className="time">1h</p>
-                                <p className="time">4h</p>
-                            </div>
-                        </div>
-                    </Left>
-                    <Right>
-                        <div className="content">
-                            <Counter>86%</Counter>
-                            <InputWrapper>
-                                <div className="input-wrapper">
-                                    <SelectWrapper
-                                        onClick={() => {
-                                            setPopup(true)
-                                        }}
-                                    >
-                                        <CurrencyWrapper>
-                                            <img
-                                                src={smallList[itemId].img}
-                                                alt=""
-                                            />
-                                        </CurrencyWrapper>
-                                        <span>{smallList[itemId].name}</span>
-                                        <svg
-                                            width="16"
-                                            height="16"
-                                            viewBox="0 0 16 16"
-                                            fill="none"
-                                            className="arrow"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <path
-                                                d="M8 10L5 6L11 6L8 10Z"
-                                                fill="#23272B"
-                                            />
-                                        </svg>
-                                    </SelectWrapper>
-                                    {popup && (
-                                        <SelectBody ref={ref2}>
-                                            {smallList.map((item, index) => (
-                                                <div
-                                                    key={uuidv4()}
-                                                    className="select_card"
-                                                    onClick={() => {
-                                                        setItemId(index)
-                                                        setPopup(false)
-                                                    }}
-                                                >
-                                                    <img
-                                                        src={item.img}
-                                                        alt=""
-                                                    />
-                                                    <p>{item.name}</p>
-                                                </div>
-                                            ))}
-                                        </SelectBody>
-                                    )}
-
-                                    <input
-                                        type="number"
-                                        className="input"
-                                        placeholder="Amount"
-                                    />
-                                </div>
-                            </InputWrapper>
-                            <HelperRow>
-                                <Text>Balance: 263</Text>
-                                <Text>$257 payout</Text>
-                            </HelperRow>
-                            <Grid>
-                                <Card>10%</Card>
-                                <Card>25%</Card>
-                                <Card>50%</Card>
-                                <Card>75%</Card>
-                                <Card>Max</Card>
-                            </Grid>
-                            <Buttons>
-                                <Button onClick={() => setShow(true)}>
-                                    <svg
-                                        width="32"
-                                        height="32"
-                                        viewBox="0 0 32 32"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M16 12L22 20H10L16 12Z"
-                                            fill="#238069"
-                                        />
-                                    </svg>
-                                </Button>
-                                <Button red onClick={() => setShow(true)}>
-                                    <svg
-                                        width="32"
-                                        height="32"
-                                        viewBox="0 0 32 32"
-                                        fill="none"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                    >
-                                        <path
-                                            d="M16 20L10 12L22 12L16 20Z"
-                                            fill="#8C3045"
-                                        />
-                                    </svg>
-                                </Button>
-                            </Buttons>
-                        </div>
-                    </Right>
+                    <Chart />
+                    <BetCard />
                 </Row>
                 <Title>Trade</Title>
                 <div className="tab_container">

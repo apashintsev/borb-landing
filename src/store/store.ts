@@ -1,10 +1,12 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import web3Reducer from '../store/reducers/web3Slice'
 import appSettings from './reducers/appSettingsSlice'
+import gameSlice from './reducers/gameSlice'
 
 const rootReducer = combineReducers({
     appSettings,
     web3Reducer,
+    gameSlice,
 })
 
 export const setupStore = () => {
