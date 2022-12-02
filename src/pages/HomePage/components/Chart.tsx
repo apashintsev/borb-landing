@@ -1,8 +1,7 @@
-import * as React from 'react'
 import { useAppSelector } from '../../../hooks/redux'
 import { useUpdatePrices } from '../../../hooks/useUpdatePrices'
 import { Left } from './main'
-import { Timeframes } from './timeframes'
+import { Timeframes } from './Timeframes'
 
 export function Chart() {
         const { selectedCurrencyPrice } = useAppSelector(
