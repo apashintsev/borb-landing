@@ -45,7 +45,7 @@ export const BetItem: React.FunctionComponent<IBetItemProps> = ({ bet }) => {
 
             <span className="center">{bet.lockedAt + bet.timeframe}</span>
             <span className="chart_td center mobile-display-none">
-                <SmallChart data0={bet.points}/>
+                <SmallChart data={bet.points} isWin={isWin}/>
             </span>
             <span className={`price-${isWin ? 'increase' : 'drop'} last`}>
                 {isWin ? `+${bet.potentialReward}` : `-${bet.amount}`}
@@ -57,7 +57,7 @@ export const BetItem: React.FunctionComponent<IBetItemProps> = ({ bet }) => {
 const DataContentItem = styled.div`
     display: grid;
     gap: 32px;
-    grid-template-columns: 32px 51px 84px repeat(3, 1fr);
+    grid-template-columns: 32px 51px 50px 60px repeat(3, 1fr);
 
     @media screen and (max-width: 768px) {
         gap: 24px;

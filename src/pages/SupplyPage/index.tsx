@@ -372,6 +372,7 @@ const TitleContainer = styled.div`
 `
 
 export const SelectWrapper = styled.div`
+    cursor: pointer;
     display: flex;
     align-items: center;
 

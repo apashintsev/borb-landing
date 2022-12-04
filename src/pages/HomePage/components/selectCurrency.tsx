@@ -7,24 +7,25 @@ import { useOnClickOutside } from '../../../lib/useOnClickOutside'
 import { gameSlice } from '../../../store/reducers/gameSlice'
 
 export default function SelectCurrency() {
-    const { selectedCurrencyTicker, selectedCurrencyImg } = useAppSelector(
+    const { currencyTicker, currencyImg} = useAppSelector(
         (state) => state.gameSlice
     )
-    const { setCurrency } = gameSlice.actions
+    const { setCurrency,  } = gameSlice.actions
     const dispatch = useAppDispatch()
 
     const [secondPopup, setSecondPopup] = React.useState<boolean>(false)
     let ref3 = React.useRef(null)
     useOnClickOutside(ref3, () => setSecondPopup(false))
+
     return (
         <div className="btc_wrapper">
             <div className="btc" onClick={() => setSecondPopup(true)}>
                 <img
-                    src={selectedCurrencyImg}
-                    alt={selectedCurrencyTicker}
+                    src={currencyImg}
+                    alt={currencyTicker}
                     className="currency"
                 />
-                <h4>{selectedCurrencyTicker}</h4>
+                <h4>{currencyTicker}</h4>
                 <svg
                     width="24"
                     height="24"

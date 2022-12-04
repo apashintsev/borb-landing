@@ -18,7 +18,13 @@ export const betsApi = createApi({
     }),
     endpoints: (build) => ({
         getActive: build.query<ListResponse<BetVm>, IBetsRequest>({
-            query: ({ asset, address, timeframe, pageNumber, pageSize=10 }) => ({
+            query: ({
+                asset,
+                address,
+                timeframe,
+                pageNumber,
+                pageSize = 10,
+            }) => ({
                 url: 'bets/getActive',
                 params: {
                     asset,
@@ -28,17 +34,13 @@ export const betsApi = createApi({
                     pageSize,
                 },
             }),
-            //`bets/getActive?asset=${asset}&address=${address}&timeframe=${timeframe}&pageNumber=${pageNumber}&pageSize=${pageSize}`,
         }),
         getClosed: build.query<ListResponse<BetVm>, IBetsRequest>({
-            query: ({ asset, address, timeframe, pageNumber, pageSize=10 }) =>
+            query: ({ asset, address, timeframe, pageNumber, pageSize = 10 }) =>
                 `bets/getClosed?asset=${asset}&address=${address}&timeframe=${timeframe}&pageNumber=${pageNumber}&pageSize=${pageSize}`,
         }),
-        getUncollected: build.query<
-            ApiResult<ListResponse<BetVm>>,
-            IBetsRequest
-        >({
-            query: ({ asset, address, timeframe, pageNumber, pageSize=10 }) =>
+        getUncollected: build.query<ListResponse<BetVm>, IBetsRequest>({
+            query: ({ asset, address, timeframe, pageNumber, pageSize = 10 }) =>
                 `bets/getUncollected?asset=${asset}&address=${address}&timeframe=${timeframe}&pageNumber=${pageNumber}&pageSize=${pageSize}`,
         }),
     }),

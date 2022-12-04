@@ -1515,6 +1515,11 @@
   resolved "https://registry.npmjs.org/@emotion/unitless/-/unitless-0.7.5.tgz"
   integrity sha512-OWORNpfjMsSSUBVrRBVGECkhWcULOAJz9ZW8uK9qgxD+87M7jHRcvh/A96XXNhXTLmKcoYSQtBEX7lHMO7YRwg==
 
+"@enzoferey/ethers-error-parser@^0.2.2":
+  version "0.2.2"
+  resolved "https://registry.npmjs.org/@enzoferey/ethers-error-parser/-/ethers-error-parser-0.2.2.tgz#b709a777ea03290c9e9ffa6ee08795797ce1957a"
+  integrity sha512-OZuPvUEIWwUFhR1vWOAMA6lTKCxGLTPxH2nEbg7V5uO1jvuKzQdHdvzmrT8ljHb0JAIN+oHDr3ArsciVxSIXIg==
+
 "@eslint/eslintrc@^0.4.3":
   version "0.4.3"
   resolved "https://registry.npmjs.org/@eslint/eslintrc/-/eslintrc-0.4.3.tgz#9e42981ef035beb3dd49add17acb96e8ff6f394c"

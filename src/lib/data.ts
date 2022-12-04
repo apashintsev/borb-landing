@@ -1,4 +1,4 @@
-import { Asset, CurrencyTicker } from '../@types/Game/game'
+import { Asset, CurrencyTicker, Timeframe } from '../@types/Game/game'
 
 interface AllowedCurrencies {
     name: string
@@ -74,3 +74,22 @@ export const allowedAssets: AllowedAssets[] = [
         img: '/images/earn/usdc_logo.svg',
     },
 ]
+
+export const allowedTimeframes: Timeframe[] = [
+    '5m',
+    '15m',
+    '30m',
+    '1h',
+    '4h',
+    '24h',
+]
+export const allowedTimeframesInSeconds: number[] = [
+    5 * 60,
+    15 * 60,
+    30 * 60,
+    60 * 60,
+    4 * 60 * 60,
+    24 * 60 * 60,
+]
+
+export const regexEthAddress = /(0x[A-Fa-f0-9]{40})/g

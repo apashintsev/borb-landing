@@ -19,37 +19,34 @@ interface IPagesSettings {
 }
 
 export function History() {
-    const { selectedAsset, selectedTimeframe } = useAppSelector(
+    const { asset, selectedTimeframe } = useAppSelector(
         (state) => state.gameSlice
     )
-    const [pageSettings, setPageSettings] = useState({
-        currentPage: 0,
-    } as IPagesSettings)
+    const [currentPage, setCurrentPage] = useState(0)
     const { data: dataActive } = betsApi.useGetActiveQuery({
-        asset: selectedAsset,
+        asset: asset,
         address: '0x78E4cc313C7ECdD2f86C0A3ac9AbeD26FCcFfF70',
-        timeframe: 1,
-        pageNumber: pageSettings.currentPage,
+        timeframe: 1,//todo fix
+        pageNumber: currentPage,
     })
     const { data: dataClosed } = betsApi.useGetClosedQuery({
-        asset: selectedAsset,
+        asset: asset,
         address: '0x78E4cc313C7ECdD2f86C0A3ac9AbeD26FCcFfF70',
         timeframe: 1,
-        pageNumber: pageSettings.currentPage,
+        pageNumber: currentPage,
     })
-    const { data: dataUncollected } = betsApi.useGetClosedQuery({
-        asset: selectedAsset,
+    const { data: dataUncollected } = betsApi.useGetUncollectedQuery({
+        asset: asset,
         address: '0x78E4cc313C7ECdD2f86C0A3ac9AbeD26FCcFfF70',
         timeframe: 1,
-        pageNumber: pageSettings.currentPage,
+        pageNumber: currentPage,
     })
 
     const [activeTabName, setActiveTabName] = useState<ActiveTab>('Active')
-    const [betsList, setBetsList] = useState([] as BetVm[])
 
     const setActiveTab = (tabName: ActiveTab) => {
         setActiveTabName(tabName)
-        setPageSettings({ currentPage: 0 } as IPagesSettings)
+        setCurrentPage(0)
     }
 
     const getBetList = (): BetVm[] | undefined => {
@@ -58,18 +55,19 @@ export function History() {
         return dataActive?.data
     }
 
+    const getPageSettings = (): IPagesSettings => {
+        const val: IPagesSettings =
+            activeTabName === 'Closed'
+                ? { ...dataClosed! }
+                : activeTabName === 'Uncollected'
+                ? { ...dataUncollected! }
+                : { ...dataActive! }
+        return val
+    }
+
     return (
         <>
-            <button
-                style={{ backgroundColor: 'red' }}
-                onClick={() =>
-                    setPageSettings({
-                        currentPage: pageSettings.currentPage + 1,
-                    } as IPagesSettings)
-                }
-            >
-                inc
-            </button>
+            <button style={{ backgroundColor: 'red' }}>inc</button>
             <Title>Trade</Title>
             <div className="tab_container">
                 <TabContainer>
@@ -113,16 +111,28 @@ export function History() {
                 </DataContent>
             </DataTable>
             <Pagination>
-                {pageSettings.hasPrevious && (
-                    <img src="/images/home/pagination.svg" alt="Previous" />
-                )}
-                {pageSettings.hasNext && (
-                    <img
-                        src="/images/home/pagination.svg"
-                        alt="Next"
-                        style={{ transform: 'rotate(180deg)' }}
-                    />
-                )}
+                <img
+                    style={{
+                        visibility: getPageSettings().hasPrevious
+                            ? 'visible'
+                            : 'hidden',
+                    }}
+                    src="/images/home/pagination.svg"
+                    alt="Previous"
+                    onClick={() => setCurrentPage(currentPage - 1)}
+                />
+
+                <img
+                    style={{
+                        visibility: getPageSettings().hasNext
+                            ? 'visible'
+                            : 'hidden',
+                        transform: 'rotate(180deg)',
+                    }}
+                    src="/images/home/pagination.svg"
+                    alt="Next"
+                    onClick={() => setCurrentPage(currentPage + 1)}
+                />
             </Pagination>
         </>
     )

@@ -4,14 +4,12 @@ import { Left } from './main'
 import { Timeframes } from './Timeframes'
 
 export function Chart() {
-        const { selectedCurrencyPrice } = useAppSelector(
-            (state) => state.gameSlice
-        )
+    const { currencyPrice } = useAppSelector((state) => state.gameSlice)
     useUpdatePrices()
     return (
         <Left>
             <div className="left_row">
-                <p className="cost">${selectedCurrencyPrice}</p>
+                <p className="cost">${currencyPrice}</p>
                 <Timeframes />
             </div>
         </Left>

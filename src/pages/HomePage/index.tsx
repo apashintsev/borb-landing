@@ -17,18 +17,13 @@ import { gameSlice } from '../../store/reducers/gameSlice'
 import SelectCurrency from './components/SelectCurrency'
 import { BetCard } from './components/BetCard'
 import { Chart } from './components/Chart'
-import {History} from './components/History'
-// import {
-//     getPythProgramKeyForCluster,
-//     PriceStatus,
-//     PythConnection,
-// } from '@pythnetwork/client'
+import { History } from './components/History'
+import { getQueryVariable } from '../../lib/sharedFunctions'
+import { regexEthAddress } from '../../lib/data'
 
 const Home = () => {
-    //let array = [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    const { selectedAsset} =
-        useAppSelector((state) => state.gameSlice)
-    const { changeAsset } = gameSlice.actions
+    const { asset } = useAppSelector((state) => state.gameSlice)
+    const { setRef } = gameSlice.actions
     const dispatch = useAppDispatch()
     const [show, setShow] = React.useState<boolean>(false)
     const [popup, setPopup] = React.useState<boolean>(false)
@@ -38,10 +33,12 @@ const Home = () => {
     useOnClickOutside(ref2, () => setPopup(false))
 
     useEffect(() => {
-        //request data from contract
-    }, [selectedAsset])
-
-
+        const refFromUrl = getQueryVariable('ref').toString()
+        let result = refFromUrl.match(regexEthAddress)
+        if (!!result && result?.length > 0) {
+            dispatch(setRef(result[0]))
+        }
+    }, [asset])
 
     return (
         <StyledHome>
@@ -51,7 +48,7 @@ const Home = () => {
                     <Chart />
                     <BetCard />
                 </Row>
-                <History/>
+                <History />
 
                 <Popup show={show}>
                     <PopupContent ref={ref}>
@@ -173,5 +170,4 @@ export const SelectBodyHead = styled.div`
         }
     }
 `
-
 export default Home
