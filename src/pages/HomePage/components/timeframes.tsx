@@ -14,12 +14,14 @@ export function Timeframes() {
             {allowedTimeframes.map((timeframe) => (
                 <p
                     className={`time ${
-                        selectedTimeframe === timeframe ? 'active' : ''
+                        selectedTimeframe.name === timeframe.name
+                            ? 'active'
+                            : ''
                     }`}
                     key={uuidv4()}
-                    onClick={() => dispatch(setTimeframe(timeframe))}
+                    onClick={() => dispatch(setTimeframe(timeframe.name))}
                 >
-                    {timeframe}
+                    {timeframe.name}
                 </p>
             ))}
         </div>

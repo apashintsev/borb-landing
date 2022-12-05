@@ -1,6 +1,7 @@
 import { Asset, CurrencyTicker, Timeframe } from '../@types/Game/game'
 
 interface AllowedCurrencies {
+    id: number
     name: string
     ticker: CurrencyTicker
     img: string
@@ -8,88 +9,92 @@ interface AllowedCurrencies {
 
 export let allowedCurrencies: AllowedCurrencies[] = [
     {
+        id: 0,
         name: 'Bitcoin',
         ticker: 'BTC',
         img: '/images/home/bitcoin.svg',
     },
     {
+        id: 1,
         name: 'Ethereum',
         ticker: 'ETH',
-        img: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=023',
+        img: '/images/home/ethereum-eth-logo.svg?v=023',
     },
     {
+        id: 2,
         name: 'Solana',
         ticker: 'SOL',
-        img: 'https://bitbill.oss-accelerate.aliyuncs.com/pics/coins/solana-plain.svg',
+        img: '/images/home/solana-plain.svg',
     },
     {
+        id: 3,
         name: 'BNB',
         ticker: 'BNB',
-        img: 'https://cryptologos.cc/logos/bnb-bnb-logo.svg?v=023',
+        img: '/images/home/bnb-bnb-logo.svg?v=023',
     },
     {
+        id: 4,
         name: 'Cardano',
         ticker: 'ADA',
-        img: 'https://cryptologos.cc/logos/cardano-ada-logo.svg?v=023',
+        img: '/images/home/cardano-ada-logo.svg?v=023',
     },
     {
+        id: 5,
         name: 'Polkadot',
         ticker: 'DOT',
-        img: 'https://cryptologos.cc/logos/polkadot-new-dot-logo.svg?v=023',
+        img: '/images/home/polkadot-new-dot-logo.svg?v=023',
     },
     {
+        id: 6,
         name: 'Polygon',
         ticker: 'MATIC',
-        img: 'https://cryptologos.cc/logos/polygon-matic-logo.svg?v=023',
+        img: '/images/home/polygon-matic-logo.svg?v=023',
     },
     {
+        id: 7,
         name: 'Dogecoin',
         ticker: 'DOGE',
-        img: 'https://cryptologos.cc/logos/dogecoin-doge-logo.svg?v=023',
+        img: '/images/home/dogecoin-doge-logo.svg?v=023',
     },
     {
+        id: 8,
         name: 'Cosmos',
         ticker: 'ATOM',
-        img: 'https://cryptologos.cc/logos/cosmos-atom-logo.svg?v=023',
+        img: '/images/home/cosmos-atom-logo.svg?v=023',
     },
     {
+        id: 9,
         name: 'Avalanche',
         ticker: 'AVAX',
-        img: 'https://cryptologos.cc/logos/avalanche-avax-logo.svg?v=023',
+        img: '/images/home/avalanche-avax-logo.svg?v=023',
     },
 ]
 
 interface AllowedAssets {
+    id:number
     name: Asset
     img: string
 }
 
 export const allowedAssets: AllowedAssets[] = [
     {
+        id:0,
         name: 'USDT',
         img: '/images/earn/usdt_logo.svg',
     },
     {
+        id:1,
         name: 'USDC',
         img: '/images/earn/usdc_logo.svg',
     },
 ]
 
 export const allowedTimeframes: Timeframe[] = [
-    '5m',
-    '15m',
-    '30m',
-    '1h',
-    '4h',
-    '24h',
+    { name: '5m', value: 5 * 60 },
+    { name: '15m', value: 15 * 60 },
+    { name: '30m', value: 30 * 60 },
+    { name: '1h', value: 60 * 60 },
+    { name: '4h', value: 4 * 60 * 60 },
+    { name: '24h', value: 24 * 60 * 60 },
 ]
-export const allowedTimeframesInSeconds: number[] = [
-    5 * 60,
-    15 * 60,
-    30 * 60,
-    60 * 60,
-    4 * 60 * 60,
-    24 * 60 * 60,
-]
-
 export const regexEthAddress = /(0x[A-Fa-f0-9]{40})/g

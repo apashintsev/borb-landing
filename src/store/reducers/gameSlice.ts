@@ -1,7 +1,16 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { BigNumber, ethers } from 'ethers'
-import { Asset, CurrencyTicker, Timeframe } from '../../@types/Game/game'
-import { allowedAssets, allowedCurrencies } from '../../lib/data'
+import {
+    Asset,
+    CurrencyTicker,
+    Timeframe,
+    TimeframeName,
+} from '../../@types/Game/game'
+import {
+    allowedAssets,
+    allowedCurrencies,
+    allowedTimeframes,
+} from '../../lib/data'
 
 export const initialState = {
     ref: ethers.constants.AddressZero,
@@ -12,10 +21,13 @@ export const initialState = {
     poolContractAddress: process.env.REACT_APP_POOL_CONTRACT!,
     assetContractAddress: '' as string,
     currentRewardPercent: 86,
-    selectedTimeframe: '5m' as Timeframe,
+    selectedTimeframe: { name: '5m', value: 300 } as Timeframe,
     currencyTicker: 'BTC' as CurrencyTicker,
     currencyImg: '/images/home/bitcoin.svg' as string,
     currencyPrice: 25000 as number,
+    activeBetsCount: 0, //TODO
+    closedBetsCount: 0, //TODO
+    uncollectedBetsCount: 0, //TODO
 }
 export const gameSlice = createSlice({
     name: 'game',
@@ -36,8 +48,10 @@ export const gameSlice = createSlice({
         setRewardPercent(state, action: PayloadAction<number>) {
             state.currentRewardPercent = action.payload
         },
-        setTimeframe(state, action: PayloadAction<Timeframe>) {
-            state.selectedTimeframe = action.payload
+        setTimeframe(state, action: PayloadAction<TimeframeName>) {
+            state.selectedTimeframe = allowedTimeframes.find(
+                (x) => x.name === action.payload
+            )!
         },
         setCurrency(state, action: PayloadAction<CurrencyTicker>) {
             state.currencyTicker = action.payload

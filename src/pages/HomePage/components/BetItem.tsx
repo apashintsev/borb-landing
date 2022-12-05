@@ -16,6 +16,10 @@ export const BetItem: React.FunctionComponent<IBetItemProps> = ({ bet }) => {
         (bet.betType == 0 && bet.lockPrice < lastPrice) ||
         (bet.betType == 1 && bet.lockPrice > lastPrice)
 
+    const datetime = new Date(
+        Date.parse(bet.lockedAt) + bet.timeframe * 1000
+    ).toLocaleString()
+
     return (
         <DataContentItem key={bet.betId}>
             <span className="center mobile-display-none">
@@ -43,9 +47,9 @@ export const BetItem: React.FunctionComponent<IBetItemProps> = ({ bet }) => {
             </span>
             <span className="center">${bet.lockPrice}</span>
 
-            <span className="center">{bet.lockedAt + bet.timeframe}</span>
+            <span className="center">{datetime}</span>
             <span className="chart_td center mobile-display-none">
-                <SmallChart data={bet.points} isWin={isWin}/>
+                <SmallChart data={bet.points} isWin={isWin} />
             </span>
             <span className={`price-${isWin ? 'increase' : 'drop'} last`}>
                 {isWin ? `+${bet.potentialReward}` : `-${bet.amount}`}

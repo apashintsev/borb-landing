@@ -18,7 +18,7 @@ const providerOptions = {
 let web3Modal: Web3Modal | null;
 if (typeof window !== "undefined") {
   web3Modal = new Web3Modal({
-    network: "mainnet", // optional
+    //network: "mainnet", // optional
     //cacheProvider: true,
     providerOptions, // required
   });
@@ -50,6 +50,7 @@ export const useWeb3 = () => {
         });
 
         const provider = await web3Modal.connect();
+        console.log({provider})
         const web3Provider = new ethers.providers.Web3Provider(provider);
         const signer = web3Provider.getSigner();
         const address = await signer.getAddress();

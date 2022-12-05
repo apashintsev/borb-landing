@@ -1,6 +1,5 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { v4 as uuidv4 } from 'uuid'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 import { allowedCurrencies } from '../../../lib/data'
 import { useOnClickOutside } from '../../../lib/useOnClickOutside'
@@ -40,7 +39,7 @@ export default function SelectCurrency() {
                 <SelectBodyHead ref={ref3}>
                     {allowedCurrencies.map((item) => (
                         <div
-                            key={uuidv4()}
+                            key={item.id}
                             className="select_card"
                             onClick={() => {
                                 dispatch(setCurrency(item.ticker))

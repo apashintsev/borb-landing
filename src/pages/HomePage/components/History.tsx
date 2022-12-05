@@ -6,6 +6,8 @@ import { BetVm } from '../../../@types/Game/bet'
 import { BetItem } from './BetItem'
 import { betsApi } from '../../../store/api/bets'
 import { useAppSelector } from '../../../hooks/redux'
+import { allowedTimeframes } from '../../../lib/data'
+import { useWeb3Context } from '../../../context/Web3Context'
 
 type ActiveTab = 'Active' | 'Closed' | 'Uncollected'
 
@@ -19,26 +21,33 @@ interface IPagesSettings {
 }
 
 export function History() {
+    const { address } = useWeb3Context()
     const { asset, selectedTimeframe } = useAppSelector(
         (state) => state.gameSlice
     )
     const [currentPage, setCurrentPage] = useState(0)
     const { data: dataActive } = betsApi.useGetActiveQuery({
         asset: asset,
-        address: '0x78E4cc313C7ECdD2f86C0A3ac9AbeD26FCcFfF70',
-        timeframe: 1,//todo fix
+        address: address!,
+        timeframe: allowedTimeframes.find(
+            (x) => x.name === selectedTimeframe.name
+        )!.value,
         pageNumber: currentPage,
     })
     const { data: dataClosed } = betsApi.useGetClosedQuery({
         asset: asset,
-        address: '0x78E4cc313C7ECdD2f86C0A3ac9AbeD26FCcFfF70',
-        timeframe: 1,
+        address: address!,
+        timeframe: allowedTimeframes.find(
+            (x) => x.name === selectedTimeframe.name
+        )!.value,
         pageNumber: currentPage,
     })
     const { data: dataUncollected } = betsApi.useGetUncollectedQuery({
         asset: asset,
-        address: '0x78E4cc313C7ECdD2f86C0A3ac9AbeD26FCcFfF70',
-        timeframe: 1,
+        address: address!,
+        timeframe: allowedTimeframes.find(
+            (x) => x.name === selectedTimeframe.name
+        )!.value,
         pageNumber: currentPage,
     })
 
@@ -105,8 +114,8 @@ export function History() {
                 </DataHeader>
 
                 <DataContent>
-                    {getBetList()?.map((bet) => (
-                        <BetItem bet={bet} />
+                    {getBetList()?.map((bet,_idx) => (
+                        <BetItem bet={bet} key={_idx}/>
                     ))}
                 </DataContent>
             </DataTable>

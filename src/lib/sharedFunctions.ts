@@ -9,3 +9,13 @@ export function getQueryVariable(variable: string) {
     }
     return false
 }
+
+export const addressToPointsFormat = (
+    address: string,
+    firstPartTo: number,
+    secondPartFrom: number
+): string => {
+    return `${address.slice(0, firstPartTo)}....${address.slice(
+        secondPartFrom
+    )}`
+}

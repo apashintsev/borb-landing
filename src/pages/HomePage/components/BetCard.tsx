@@ -5,7 +5,6 @@ import {
     allowedAssets,
     allowedCurrencies,
     allowedTimeframes,
-    allowedTimeframesInSeconds,
 } from '../../../lib/data'
 import { gameSlice } from '../../../store/reducers/gameSlice'
 import { CurrencyWrapper, InputWrapper, SelectWrapper } from '../../SupplyPage'
@@ -25,7 +24,7 @@ import { toast } from 'react-toastify'
 import { useEffect } from 'react'
 import { BorbGame__factory } from '../../../@types/contracts/BorbGame__factory'
 import { ERC20Token__factory } from '../../../@types/contracts/ERC20Token__factory'
-import { ethers } from 'ethers'
+import { BigNumber, ethers } from 'ethers'
 import { getParsedEthersError } from '@enzoferey/ethers-error-parser'
 
 const BetTypeUP = 0
@@ -33,6 +32,8 @@ const BetTypeDown = 1
 export type BetType = 0 | 1
 
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001
+
+const MAX_BET = 1000 * 10 ** 6
 
 export function BetCard() {
     const { web3Provider, address } = useWeb3Context()
@@ -59,25 +60,20 @@ export function BetCard() {
     useEffect(() => {
         // Using an IIFE
         ;(async function anyNameFunction() {
+            if (!web3Provider) return
+
             const gameContract = BorbGame__factory.connect(
                 gameContractAddress,
                 web3Provider!
             )
             try {
                 const assetAddress = await gameContract.getAssetAddress(asset)
-                console.log({ assetAddress })
                 dispatch(setAssetContract(assetAddress))
                 if (
                     assetAddress !== ethers.constants.AddressZero &&
                     !!address
                 ) {
-                    const assetContract = ERC20Token__factory.connect(
-                        assetAddress,
-                        web3Provider!
-                    )
-                    const balance = await assetContract.balanceOf(address)
-                    console.log({ balance })
-                    dispatch(setUserBalance(balance))
+                    await updateBalance(assetAddress)
                 }
             } catch (e: any) {
                 console.error(e)
@@ -85,14 +81,42 @@ export function BetCard() {
         })()
     }, [asset, address])
 
+    async function updateBalance(assetAddress: string) {
+        const assetContract = ERC20Token__factory.connect(
+            assetAddress,
+            web3Provider!
+        )
+        const balance = await assetContract.balanceOf(address!)
+        dispatch(setUserBalance(balance))
+    }
+
     async function setBet(percent: number) {
-        let newBetValue = userBalance.gt(1000 * 10 ** 6)
-            ? 1000 * 10 ** 6
-            : userBalance
+        let newBetValue = userBalance.gt(MAX_BET) ? MAX_BET : userBalance
         if (percent !== 0) {
             newBetValue = userBalance.div(100).mul(percent)
         }
         setAmount(Number.parseFloat(ethers.utils.formatUnits(newBetValue, 6)))
+    }
+    
+    async function setBetValue(value: number) {
+        try {
+            let newBetValue = ethers.utils.parseUnits(value.toString(), 6)
+            if (
+                value >
+                Number.parseFloat(ethers.utils.formatUnits(userBalance, 6))
+            ) {
+                newBetValue = userBalance.gt(MAX_BET)
+                    ? BigNumber.from(MAX_BET)
+                    : userBalance
+            }
+            setAmount(
+                Math.abs(
+                    Number.parseFloat(ethers.utils.formatUnits(newBetValue, 6))
+                )
+            )
+        } catch {
+            setAmount(0)
+        }
     }
 
     async function makeBet(betType: BetType) {
@@ -105,29 +129,14 @@ export function BetCard() {
         )
         try {
             if (await isAllowed(amount)) {
-                console.log('args')
-                console.log(ethers.utils.parseUnits(amount.toString(), 6))
-                console.log(ref)
-                console.log(allowedTimeframes.indexOf(selectedTimeframe))
-                console.log(betType)
-                console.log(
-                    allowedCurrencies.indexOf(
-                        allowedCurrencies.find(
-                            (x) => x.ticker === currencyTicker
-                        )!
-                    )
-                )
-                const timeframe =
-                    allowedTimeframesInSeconds[
-                        allowedTimeframes.indexOf(selectedTimeframe)
-                    ]
-                console.log({ timeframe })
                 const result = await gameContract
                     .connect(web3Provider!.getSigner())
                     .makeBet(
                         ethers.utils.parseUnits(amount.toString(), 6),
                         ref,
-                        timeframe,
+                        allowedTimeframes.find(
+                            (x) => x.name === selectedTimeframe.name
+                        )!.value!,
                         allowedAssets.indexOf(
                             allowedAssets.find((x) => x.name === asset)!
                         ),
@@ -136,13 +145,14 @@ export function BetCard() {
                             allowedCurrencies.find(
                                 (x) => x.ticker === currencyTicker
                             )!
-                        )
+                        ),
+                        { gasLimit: 3000000 } //todo это убрать
                     )
                 toast.info('Wait for transaction...')
                 await result.wait()
 
                 toast.success(`Bet added`)
-                //TODO refresh balances
+                await updateBalance(assetContractAddress!)
             } else {
                 await increaseAllowance()
             }
@@ -256,7 +266,7 @@ export function BetCard() {
                             placeholder="Amount"
                             value={amount}
                             onChange={(e) =>
-                                setAmount(Number.parseFloat(e.target.value))
+                                setBetValue(Number.parseFloat(e.target.value))
                             }
                         />
                     </div>
