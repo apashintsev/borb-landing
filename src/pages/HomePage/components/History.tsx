@@ -76,7 +76,6 @@ export function History() {
 
     return (
         <>
-            <button style={{ backgroundColor: 'red' }}>inc</button>
             <Title>Trade</Title>
             <div className="tab_container">
                 <TabContainer>
@@ -114,8 +113,8 @@ export function History() {
                 </DataHeader>
 
                 <DataContent>
-                    {getBetList()?.map((bet,_idx) => (
-                        <BetItem bet={bet} key={_idx}/>
+                    {getBetList()?.map((bet, _idx) => (
+                        <BetItem bet={bet} key={_idx} />
                     ))}
                 </DataContent>
             </DataTable>
