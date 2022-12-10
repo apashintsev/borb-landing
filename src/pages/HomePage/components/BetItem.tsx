@@ -11,7 +11,7 @@ export interface IBetItemProps {
 export const BetItem: React.FunctionComponent<IBetItemProps> = ({ bet }) => {
     const betCurrency = allowedCurrencies.find((x) => x.ticker === bet.currency)
     const lastPrice = bet.points[bet.points.length]
-    const directionUp = lastPrice > bet.lockPrice
+    const directionUp = bet.betType === 0
     const isWin =
         (bet.betType == 0 && bet.lockPrice < lastPrice) ||
         (bet.betType == 1 && bet.lockPrice > lastPrice)
@@ -24,9 +24,6 @@ export const BetItem: React.FunctionComponent<IBetItemProps> = ({ bet }) => {
         <DataContentItem key={bet.betId}>
             <span className="center mobile-display-none">
                 <img src={betCurrency?.img} alt={betCurrency?.name} />
-            </span>
-            <span className="center mobile-display-none">
-                {bet.betType === 0 ? 'Up' : 'Down'}
             </span>
             <span className="">
                 <svg
@@ -61,7 +58,7 @@ export const BetItem: React.FunctionComponent<IBetItemProps> = ({ bet }) => {
 const DataContentItem = styled.div`
     display: grid;
     gap: 32px;
-    grid-template-columns: 32px 51px 50px 60px repeat(3, 1fr);
+    grid-template-columns: 32px 51px 84px repeat(3, 1fr);
 
     @media screen and (max-width: 768px) {
         gap: 24px;

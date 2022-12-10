@@ -26,6 +26,7 @@ import { BorbGame__factory } from '../../../@types/contracts/BorbGame__factory'
 import { ERC20Token__factory } from '../../../@types/contracts/ERC20Token__factory'
 import { BigNumber, ethers } from 'ethers'
 import { getParsedEthersError } from '@enzoferey/ethers-error-parser'
+import { SelectAsset } from './SelectAsset'
 
 const BetTypeUP = 0
 const BetTypeDown = 1
@@ -222,44 +223,7 @@ export function BetCard() {
                 <Counter>{currentRewardPercent}%</Counter>
                 <InputWrapper>
                     <div className="input-wrapper">
-                        <SelectWrapper
-                            onClick={() => {
-                                setPopup(true)
-                            }}
-                        >
-                            <CurrencyWrapper>
-                                <img src={assetImg} alt={asset} />
-                            </CurrencyWrapper>
-                            <span>{asset}</span>
-                            <svg
-                                width="16"
-                                height="16"
-                                viewBox="0 0 16 16"
-                                fill="none"
-                                className="arrow"
-                                xmlns="http://www.w3.org/2000/svg"
-                            >
-                                <path d="M8 10L5 6L11 6L8 10Z" fill="#23272B" />
-                            </svg>
-                        </SelectWrapper>
-                        {popup && (
-                            <SelectBody ref={ref2}>
-                                {allowedAssets.map((item) => (
-                                    <div
-                                        key={uuidv4()}
-                                        className="select_card"
-                                        onClick={() => {
-                                            dispatch(setAsset(item.name))
-                                            setPopup(false)
-                                        }}
-                                    >
-                                        <img src={item.img} alt={item.name} />
-                                        <p>{item.name}</p>
-                                    </div>
-                                ))}
-                            </SelectBody>
-                        )}
-
+                        <SelectAsset/>
                         <input
                             type="number"
                             className="input"
@@ -318,38 +282,4 @@ export function BetCard() {
     )
 }
 
-export const SelectBody = styled.div`
-    position: absolute;
-    z-index: 111;
-    left: 8px;
-    top: 45px;
-    width: 150px;
-    padding: 16px 0;
-    background: ${(props) => props.theme.navbarBg};
-    border-radius: 8px;
-    box-shadow: 0 5px 20px rgb(0 0 0 / 25%);
-    .select_card {
-        display: flex;
-        align-items: center;
-        padding: 8px 16px;
-        cursor: pointer;
 
-        img {
-            width: 20px;
-            height: 20px;
-        }
-
-        p {
-            color: ${(props) => props.theme.arrowBackgroundColor};
-            margin-left: 16px;
-            text-transform: uppercase;
-            font-size: 16px;
-        }
-        &:hover {
-            background: ${(props) => props.theme.selectColor};
-            p {
-                color: ${(props) => props.theme.navbarBg};
-            }
-        }
-    }
-`

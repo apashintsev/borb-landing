@@ -34,7 +34,7 @@ export default function SelectCurrency() {
                 >
                     <path d="M12 15L7.5 9L16.5 9L12 15Z" fill="#23272B" />
                 </svg>
-            </div>{' '}
+            </div>
             {secondPopup && (
                 <SelectBodyHead ref={ref3}>
                     {allowedCurrencies.map((item) => (

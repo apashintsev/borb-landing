@@ -104,7 +104,6 @@ export function History() {
             <DataTable>
                 <DataHeader>
                     <span className="center mobile-display-none">Asset</span>
-                    <span className="mobile-no-color">Bet Type</span>
                     <span className="mobile-no-color">Direction</span>
                     <span className="">Open</span>
                     <span>Close</span>
@@ -160,7 +159,7 @@ const DataTable = styled.div`
 `
 const DataHeader = styled.div`
     display: grid;
-    grid-template-columns: 32px 51px 50px 60px repeat(3, 1fr);
+    grid-template-columns: 32px 51px 84px repeat(3, 1fr);
     gap: 32px;
 
     span {

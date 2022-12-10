@@ -4,18 +4,75 @@ import { ReactComponent as USDCIcon } from '../../assets/usdc-icon.svg'
 import { ReactComponent as Arrow } from '../../assets/arrow-down-icon.svg'
 import { Faq } from '../../components/Faq'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { SelectBody } from '../HomePage'
 import { useOnClickOutside } from '../../lib/useOnClickOutside'
 import { allowedAssets } from '../../lib/data'
+import { useWeb3Context } from '../../context/Web3Context'
+import { useAppDispatch, useAppSelector } from '../../hooks/redux'
+import { BorbGame__factory } from '../../@types/contracts/BorbGame__factory'
+import { gameSlice } from '../../store/reducers/gameSlice'
+import { ethers } from 'ethers'
+import { ERC20Token__factory } from '../../@types/contracts/ERC20Token__factory'
+import { SelectAsset } from '../HomePage/components/SelectAsset'
 
+type ActiveTab = 'Supply' | 'Withdraw'
 const SupplyPage = () => {
     const isMobile = useMediaQuery('(max-width: 768px)')
     const [popup, setPopup] = useState(false)
     const [itemId, setItemId] = useState(0)
     const reff = useRef(null)
     useOnClickOutside(reff, () => setPopup(false))
+    //==
+    const [activeTabName, setActiveTabName] = useState<ActiveTab>('Supply')
+    const { web3Provider, address } = useWeb3Context()
+    const {
+        ref,
+        asset,
+        assetImg,
+        currentRewardPercent,
+        gameContractAddress,
+        assetContractAddress,
+        poolContractAddress,
+        userBalance,
+        selectedTimeframe,
+        currencyTicker,
+    } = useAppSelector((state) => state.gameSlice)
+    const { setAsset, setAssetContract, setUserBalance } = gameSlice.actions
+    const dispatch = useAppDispatch()
+    useEffect(() => {
+        // Using an IIFE
+        ;(async function anyNameFunction() {
+            if (!web3Provider) return
 
+            const gameContract = BorbGame__factory.connect(
+                gameContractAddress,
+                web3Provider!
+            )
+            try {
+                const assetAddress = await gameContract.getAssetAddress(asset)
+                dispatch(setAssetContract(assetAddress))
+                if (
+                    assetAddress !== ethers.constants.AddressZero &&
+                    !!address
+                ) {
+                    await updateBalance(assetAddress)
+                }
+            } catch (e: any) {
+                console.error(e)
+            }
+        })()
+    }, [asset, address])
+
+    async function updateBalance(assetAddress: string) {
+        const assetContract = ERC20Token__factory.connect(
+            assetAddress,
+            web3Provider!
+        )
+        const balance = await assetContract.balanceOf(address!)
+        dispatch(setUserBalance(balance))
+    }
+    //==
     return (
         <StyledSupply>
             <div className="container">
@@ -24,64 +81,31 @@ const SupplyPage = () => {
                     Supply your tokens and get Token+ while earning interest
                 </Subtitle>
                 <TabContainer>
-                    <Tab active>
+                    <Tab
+                        active={activeTabName === 'Supply'}
+                        onClick={() => setActiveTabName('Supply')}
+                    >
                         <span>Supply</span>
                     </Tab>
-                    <Tab>
+                    <Tab
+                        active={activeTabName === 'Withdraw'}
+                        onClick={() => setActiveTabName('Withdraw')}
+                    >
                         <span>Withdraw</span>
                     </Tab>
                 </TabContainer>
                 <InputContainer>
                     <InputWrapper>
                         <TitleContainer>
-                            <SettingsTitle margin="9px">Supply</SettingsTitle>
+                            <SettingsTitle margin="9px">
+                                {activeTabName}
+                            </SettingsTitle>
                             {isMobile && (
-                                <SettingsTitle>Balance: 263</SettingsTitle>
+                                <SettingsTitle>{`Balance: ${userBalance}`}</SettingsTitle>
                             )}
                         </TitleContainer>
                         <div className="input-wrapper">
-                            <SelectWrapper
-                                onClick={() => {
-                                    setPopup(true)
-                                }}
-                            >
-                                <CurrencyWrapper>
-                                    <img
-                                        src={allowedAssets[itemId].img}
-                                        alt=""
-                                    />
-                                </CurrencyWrapper>
-                                <span>{allowedAssets[itemId].name}</span>
-                                <svg
-                                    width="16"
-                                    height="16"
-                                    viewBox="0 0 16 16"
-                                    fill="none"
-                                    className="arrow"
-                                    xmlns="http://www.w3.org/2000/svg"
-                                >
-                                    <path
-                                        d="M8 10L5 6L11 6L8 10Z"
-                                        fill="#23272B"
-                                    />
-                                </svg>
-                            </SelectWrapper>
-                            {popup && (
-                                <SelectBody ref={reff}>
-                                    {allowedAssets.map((item, index) => (
-                                        <div
-                                            className="select_card"
-                                            onClick={() => {
-                                                setItemId(index)
-                                                setPopup(false)
-                                            }}
-                                        >
-                                            <img src={item.img} alt="" />
-                                            <p>{item.name}</p>
-                                        </div>
-                                    ))}
-                                </SelectBody>
-                            )}
+                            <SelectAsset />
 
                             <input
                                 type="number"
@@ -96,36 +120,9 @@ const SupplyPage = () => {
                         <div className="input-wrapper">
                             <SelectWrapper>
                                 <CurrencyWrapper>
-                                    {itemId === 0 ? (
-                                        <img src={allowedAssets[0].img} />
-                                    ) : (
-                                        <svg
-                                            width="20"
-                                            height="20"
-                                            viewBox="0 0 20 20"
-                                            fill="none"
-                                            xmlns="http://www.w3.org/2000/svg"
-                                        >
-                                            <rect
-                                                width="20"
-                                                height="20"
-                                                rx="10"
-                                                fill="#2775CA"
-                                            />
-                                            <path
-                                                className="colored"
-                                                d="M12.7498 11.5831C12.7498 10.1248 11.8748 9.6248 10.1248 9.4165C8.87484 9.2498 8.62484 8.9165 8.62484 8.3331C8.62484 7.7497 9.04154 7.3748 9.87484 7.3748C10.6248 7.3748 11.0415 7.6248 11.2498 8.2498C11.2915 8.3748 11.4165 8.4581 11.5415 8.4581H12.2081C12.3748 8.4581 12.4998 8.3331 12.4998 8.1665V8.1248C12.3331 7.2081 11.5831 6.4998 10.6248 6.4165V5.4165C10.6248 5.2498 10.4998 5.1248 10.2915 5.0831H9.66654C9.49984 5.0831 9.37484 5.2081 9.33314 5.4165V6.3748C8.08314 6.5415 7.29154 7.3748 7.29154 8.4165C7.29154 9.7915 8.12484 10.3331 9.87484 10.5415C11.0415 10.7498 11.4165 10.9998 11.4165 11.6665C11.4165 12.3332 10.8331 12.7915 10.0415 12.7915C8.95814 12.7915 8.58314 12.3331 8.45814 11.7081C8.41654 11.5415 8.29154 11.4581 8.16654 11.4581H7.45814C7.29154 11.4581 7.16654 11.5831 7.16654 11.7498V11.7915C7.33314 12.8331 7.99984 13.5831 9.37484 13.7915V14.7915C9.37484 14.9581 9.49984 15.0831 9.70814 15.1248H10.3331C10.4998 15.1248 10.6248 14.9998 10.6665 14.7915V13.7915C11.9165 13.5831 12.7498 12.7081 12.7498 11.5831Z"
-                                                fill="white"
-                                            />
-                                            <path
-                                                className="colored"
-                                                d="M7.87484 15.9581C4.62484 14.7915 2.95814 11.1665 4.16654 7.9581C4.79154 6.2081 6.16654 4.8748 7.87484 4.2498C8.04154 4.1665 8.12484 4.0415 8.12484 3.8331V3.2498C8.12484 3.0831 8.04154 2.9581 7.87484 2.9165C7.83314 2.9165 7.74984 2.9165 7.70814 2.9581C3.74984 4.2081 1.58314 8.4165 2.83314 12.3748C3.58314 14.7081 5.37484 16.4998 7.70814 17.2498C7.87484 17.3331 8.04154 17.2498 8.08314 17.0831C8.12484 17.0415 8.12484 16.9998 8.12484 16.9165V16.3331C8.12484 16.2081 7.99984 16.0415 7.87484 15.9581ZM12.2915 2.9581C12.1248 2.8748 11.9581 2.9581 11.9165 3.1248C11.8748 3.1665 11.8748 3.2081 11.8748 3.2915V3.8748C11.8748 4.0415 11.9998 4.2081 12.1248 4.2915C15.3748 5.4581 17.0415 9.0831 15.8331 12.2915C15.2081 14.0415 13.8331 15.3748 12.1248 15.9998C11.9581 16.0831 11.8748 16.2081 11.8748 16.4165V16.9998C11.8748 17.1665 11.9581 17.2915 12.1248 17.3331C12.1665 17.3331 12.2498 17.3331 12.2915 17.2915C16.2498 16.0415 18.4165 11.8331 17.1665 7.8748C16.4165 5.4998 14.5831 3.7081 12.2915 2.9581Z"
-                                                fill="white"
-                                            />
-                                        </svg>
-                                    )}
+                                    <img src={assetImg} alt={asset} />
                                 </CurrencyWrapper>
-                                <span>{itemId === 0 ? 'USDT+' : 'USDC+'}</span>
+                                <span>{`${asset}+`}</span>
                             </SelectWrapper>
                             <input
                                 type="number"
@@ -137,9 +134,11 @@ const SupplyPage = () => {
                     </InputWrapper>
                 </InputContainer>
                 {!isMobile && (
-                    <SettingsTitle margin="24px">Balance: 263</SettingsTitle>
+                    <SettingsTitle margin="24px">
+                        {`Balance: ${userBalance}`}
+                    </SettingsTitle>
                 )}
-                <Btn>Supply {allowedAssets[itemId].name.toUpperCase()}</Btn>
+                <Btn>Supply {asset}</Btn>
                 <PurchaseWrapper>
                     <PurchaseDataList>
                         <PurchaseDataItem>
@@ -155,7 +154,7 @@ const SupplyPage = () => {
                     <PurchaseDataList>
                         <PurchaseDataItem>
                             <SettingsTitle>
-                                1USDC=1USDC+
+                                1 {asset}=1 {asset}+
                                 <InfoIcon />
                             </SettingsTitle>
                         </PurchaseDataItem>
