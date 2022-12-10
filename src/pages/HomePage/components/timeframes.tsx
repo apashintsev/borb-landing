@@ -1,5 +1,4 @@
-import { v4 as uuidv4 } from 'uuid'
-import { Timeframe } from '../../../@types/Game/game'
+
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 import { allowedTimeframes } from '../../../lib/data'
 import { gameSlice } from '../../../store/reducers/gameSlice'
@@ -11,14 +10,14 @@ export function Timeframes() {
 
     return (
         <div className="times">
-            {allowedTimeframes.map((timeframe) => (
+            {allowedTimeframes.map((timeframe, _idx) => (
                 <p
                     className={`time ${
                         selectedTimeframe.name === timeframe.name
                             ? 'active'
                             : ''
                     }`}
-                    key={uuidv4()}
+                    key={_idx}
                     onClick={() => dispatch(setTimeframe(timeframe.name))}
                 >
                     {timeframe.name}
