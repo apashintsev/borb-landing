@@ -4,11 +4,13 @@ import { betsApi } from './api/bets'
 import { referalApi } from './api/referal'
 import appSettings from './reducers/appSettingsSlice'
 import gameSlice from './reducers/gameSlice'
+import supplySlice from './reducers/supplySlice'
 
 const rootReducer = combineReducers({
     appSettings,
     web3Reducer,
     gameSlice,
+    supplySlice,
     [betsApi.reducerPath]: betsApi.reducer,
     [referalApi.reducerPath]: referalApi.reducer,
 })

@@ -9,27 +9,13 @@ import { ReferalBlock } from './components/ReferalBlock'
 import { RewardTable } from './components/RewardTable'
 import { Slider } from './components/Slider'
 import {
-    AdaptiveTable,
-    Card,
-    CardContentText,
-    CardSubLink,
-    Item,
-    Pagination,
     RewardTitle,
-    Row,
-    RowText,
-    SmallCardContent,
     StyledEarn,
     SubText,
-    TableGrid,
-    TableHead,
-    TableRow,
     Title,
 } from './components/styles'
 
 const EarnPage = () => {
-    const { address } = useWeb3Context()
-
     return (
         <StyledEarn>
             <div className="container">

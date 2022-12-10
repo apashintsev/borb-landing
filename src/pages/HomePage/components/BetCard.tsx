@@ -7,7 +7,7 @@ import {
     allowedTimeframes,
 } from '../../../lib/data'
 import { gameSlice } from '../../../store/reducers/gameSlice'
-import { CurrencyWrapper, InputWrapper, SelectWrapper } from '../../SupplyPage'
+import { InputWrapper} from '../../SupplyPage'
 import {
     Button,
     Buttons,
@@ -18,15 +18,18 @@ import {
     Right,
     Text,
 } from './main'
-import { v4 as uuidv4 } from 'uuid'
 import { useWeb3Context } from '../../../context/Web3Context'
 import { toast } from 'react-toastify'
 import { useEffect } from 'react'
 import { BorbGame__factory } from '../../../@types/contracts/BorbGame__factory'
-import { ERC20Token__factory } from '../../../@types/contracts/ERC20Token__factory'
 import { BigNumber, ethers } from 'ethers'
 import { getParsedEthersError } from '@enzoferey/ethers-error-parser'
 import { SelectAsset } from './SelectAsset'
+import {
+    getBalance,
+    increaseAllowance,
+    isAllowed,
+} from '../../../store/api/contracts'
 
 const BetTypeUP = 0
 const BetTypeDown = 1
@@ -53,7 +56,6 @@ export function BetCard() {
     const { setAsset, setAssetContract, setUserBalance } = gameSlice.actions
     const dispatch = useAppDispatch()
 
-    const [show, setShow] = React.useState<boolean>(false)
     const [popup, setPopup] = React.useState<boolean>(false)
     let ref2 = React.useRef(null)
     const [amount, setAmount] = React.useState<number>(0)
@@ -74,22 +76,21 @@ export function BetCard() {
                     assetAddress !== ethers.constants.AddressZero &&
                     !!address
                 ) {
-                    await updateBalance(assetAddress)
+                    dispatch(
+                        setUserBalance(
+                            await getBalance(
+                                assetContractAddress!,
+                                address!,
+                                web3Provider!
+                            )
+                        )
+                    )
                 }
             } catch (e: any) {
                 console.error(e)
             }
         })()
     }, [asset, address])
-
-    async function updateBalance(assetAddress: string) {
-        const assetContract = ERC20Token__factory.connect(
-            assetAddress,
-            web3Provider!
-        )
-        const balance = await assetContract.balanceOf(address!)
-        dispatch(setUserBalance(balance))
-    }
 
     async function setBet(percent: number) {
         let newBetValue = userBalance.gt(MAX_BET) ? MAX_BET : userBalance
@@ -98,7 +99,7 @@ export function BetCard() {
         }
         setAmount(Number.parseFloat(ethers.utils.formatUnits(newBetValue, 6)))
     }
-    
+
     async function setBetValue(value: number) {
         try {
             let newBetValue = ethers.utils.parseUnits(value.toString(), 6)
@@ -129,7 +130,15 @@ export function BetCard() {
             web3Provider!
         )
         try {
-            if (await isAllowed(amount)) {
+            if (
+                await isAllowed(
+                    address!,
+                    assetContractAddress!,
+                    web3Provider!,
+                    amount,
+                    poolContractAddress
+                )
+            ) {
                 const result = await gameContract
                     .connect(web3Provider!.getSigner())
                     .makeBet(
@@ -153,9 +162,21 @@ export function BetCard() {
                 await result.wait()
 
                 toast.success(`Bet added`)
-                await updateBalance(assetContractAddress!)
+                dispatch(
+                    setUserBalance(
+                        await getBalance(
+                            assetContractAddress!,
+                            address!,
+                            web3Provider!
+                        )
+                    )
+                )
             } else {
-                await increaseAllowance()
+                await increaseAllowance(
+                    assetContractAddress,
+                    web3Provider!,
+                    poolContractAddress
+                )
             }
         } catch (error: any) {
             console.log({ error })
@@ -182,48 +203,13 @@ export function BetCard() {
         }
     }
 
-    async function increaseAllowance() {
-        const assetContract = ERC20Token__factory.connect(
-            assetContractAddress,
-            web3Provider!
-        )
-
-        const result = await assetContract
-            .connect(web3Provider!.getSigner())
-            .approve(poolContractAddress, ethers.constants.MaxUint256)
-        toast.info('Wait for transaction...')
-        await result.wait()
-
-        toast.success(`Allowance increased`)
-    }
-
-    async function isAllowed(amount: number): Promise<boolean> {
-        if (!!address && !!assetContractAddress) {
-            try {
-                const assetContract = ERC20Token__factory.connect(
-                    assetContractAddress,
-                    web3Provider!
-                )
-                const result = await assetContract.allowance(
-                    address,
-                    poolContractAddress
-                )
-                return result.toBigInt() >= amount
-            } catch (e: any) {
-                console.log(e)
-                toast.error(e.message)
-            }
-        }
-        return false
-    }
-
     return (
         <Right>
             <div className="content">
                 <Counter>{currentRewardPercent}%</Counter>
                 <InputWrapper>
                     <div className="input-wrapper">
-                        <SelectAsset/>
+                        <SelectAsset />
                         <input
                             type="number"
                             className="input"
@@ -281,5 +267,3 @@ export function BetCard() {
         </Right>
     )
 }
-
-

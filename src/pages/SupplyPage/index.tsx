@@ -1,20 +1,26 @@
 import styled from 'styled-components'
 import { ReactComponent as InfoIcon } from '../../assets/info-icon.svg'
-import { ReactComponent as USDCIcon } from '../../assets/usdc-icon.svg'
 import { ReactComponent as Arrow } from '../../assets/arrow-down-icon.svg'
 import { Faq } from '../../components/Faq'
 import { useMediaQuery } from '../../hooks/useMediaQuery'
 import { useEffect, useRef, useState } from 'react'
-import { SelectBody } from '../HomePage'
 import { useOnClickOutside } from '../../lib/useOnClickOutside'
-import { allowedAssets } from '../../lib/data'
 import { useWeb3Context } from '../../context/Web3Context'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
 import { BorbGame__factory } from '../../@types/contracts/BorbGame__factory'
 import { gameSlice } from '../../store/reducers/gameSlice'
 import { ethers } from 'ethers'
-import { ERC20Token__factory } from '../../@types/contracts/ERC20Token__factory'
 import { SelectAsset } from '../HomePage/components/SelectAsset'
+import { Pool__factory } from '../../@types/contracts/Pool__factory'
+import {
+    getBalance,
+    increaseAllowance,
+    isAllowed,
+} from '../../store/api/contracts'
+import { supplySlice } from '../../store/reducers/supplySlice'
+import { allowedAssets } from '../../lib/data'
+import { toast } from 'react-toastify'
+import { getParsedEthersError } from '@enzoferey/ethers-error-parser'
 
 type ActiveTab = 'Supply' | 'Withdraw'
 const SupplyPage = () => {
@@ -24,22 +30,36 @@ const SupplyPage = () => {
     const reff = useRef(null)
     useOnClickOutside(reff, () => setPopup(false))
     //==
+    const [amount, setAmount] = useState<number>(0)
+    const [amountTokenPlus, setAmountTokenPlus] = useState<number>(0)
     const [activeTabName, setActiveTabName] = useState<ActiveTab>('Supply')
+
     const { web3Provider, address } = useWeb3Context()
     const {
-        ref,
         asset,
         assetImg,
-        currentRewardPercent,
         gameContractAddress,
         assetContractAddress,
         poolContractAddress,
         userBalance,
-        selectedTimeframe,
-        currencyTicker,
     } = useAppSelector((state) => state.gameSlice)
+    const {
+        assetTokenPlusContractAddress,
+        tokenPlusBalance,
+        buyPrice,
+        sellPrice,
+    } = useAppSelector((state1) => state1.supplySlice)
     const { setAsset, setAssetContract, setUserBalance } = gameSlice.actions
+    const {
+        setAssetTokenPlusContract,
+        setBuyPrice,
+        setSellPrice,
+        setTokenPlusBalance,
+    } = supplySlice.actions
     const dispatch = useAppDispatch()
+    const ERROR_CODE_TX_REJECTED_BY_USER = 4001
+    const exchangeRate =
+        (activeTabName === 'Supply' ? buyPrice : sellPrice).toNumber() / 100
     useEffect(() => {
         // Using an IIFE
         ;(async function anyNameFunction() {
@@ -49,14 +69,60 @@ const SupplyPage = () => {
                 gameContractAddress,
                 web3Provider!
             )
+            const poolContract = Pool__factory.connect(
+                poolContractAddress,
+                web3Provider!
+            )
             try {
                 const assetAddress = await gameContract.getAssetAddress(asset)
                 dispatch(setAssetContract(assetAddress))
+                const tokenPlusAddress =
+                    await poolContract.getAssetTokenPlusAddress(asset)
+                dispatch(setAssetTokenPlusContract(tokenPlusAddress))
                 if (
                     assetAddress !== ethers.constants.AddressZero &&
+                    tokenPlusAddress !== ethers.constants.AddressZero &&
                     !!address
                 ) {
-                    await updateBalance(assetAddress)
+                    dispatch(
+                        setUserBalance(
+                            await getBalance(
+                                assetAddress!,
+                                address!,
+                                web3Provider!
+                            )
+                        )
+                    )
+
+                    dispatch(
+                        setTokenPlusBalance(
+                            await getBalance(
+                                tokenPlusAddress!,
+                                address!,
+                                web3Provider!
+                            )
+                        )
+                    )
+
+                    dispatch(
+                        setBuyPrice(
+                            await poolContract.getTokenPlusBuyPrice(
+                                allowedAssets.indexOf(
+                                    allowedAssets.find((x) => x.name === asset)!
+                                )
+                            )
+                        )
+                    )
+
+                    dispatch(
+                        setSellPrice(
+                            await poolContract.getTokenPlusSellPrice(
+                                allowedAssets.indexOf(
+                                    allowedAssets.find((x) => x.name === asset)!
+                                )
+                            )
+                        )
+                    )
                 }
             } catch (e: any) {
                 console.error(e)
@@ -64,13 +130,169 @@ const SupplyPage = () => {
         })()
     }, [asset, address])
 
-    async function updateBalance(assetAddress: string) {
-        const assetContract = ERC20Token__factory.connect(
-            assetAddress,
+    async function setInputValue(value: number) {
+        try {
+            const balance =
+                activeTabName === 'Supply' ? userBalance : tokenPlusBalance
+            let newBetValue = ethers.utils.parseUnits(value.toString(), 6)
+            if (
+                value > Number.parseFloat(ethers.utils.formatUnits(balance, 6))
+            ) {
+                newBetValue = balance
+            }
+            const valueN = Math.abs(
+                Number.parseFloat(ethers.utils.formatUnits(newBetValue, 6))
+            )
+            setAmount(valueN)
+            setAmountTokenPlus(valueN * exchangeRate)
+        } catch {
+            setAmount(0)
+            setAmountTokenPlus(0)
+        }
+    }
+
+    async function deposit() {
+        if (!address) {
+            toast.info('Please connect wallet')
+        }
+        const poolContract = Pool__factory.connect(
+            poolContractAddress,
             web3Provider!
         )
-        const balance = await assetContract.balanceOf(address!)
-        dispatch(setUserBalance(balance))
+        try {
+            if (
+                await isAllowed(
+                    address!,
+                    assetContractAddress!,
+                    web3Provider!,
+                    amount,
+                    poolContractAddress
+                )
+            ) {
+                const result = await poolContract
+                    .connect(web3Provider!.getSigner())
+                    .makeDeposit(
+                        allowedAssets.indexOf(
+                            allowedAssets.find((x) => x.name === asset)!
+                        ),
+                        ethers.utils.parseUnits(amount.toString(), 6),
+                        { gasLimit: 3000000 } //todo это убрать
+                    )
+                toast.info('Wait for transaction...')
+                await result.wait()
+
+                toast.success(`Deposit added`)
+                dispatch(
+                    setUserBalance(
+                        await getBalance(
+                            assetContractAddress!,
+                            address!,
+                            web3Provider!
+                        )
+                    )
+                )
+            } else {
+                await increaseAllowance(
+                    assetContractAddress,
+                    web3Provider!,
+                    poolContractAddress
+                )
+            }
+        } catch (error: any) {
+            console.log({ error })
+            console.log('=========================================')
+            const parsedEthersError = getParsedEthersError(error)
+            console.log({ parsedEthersError })
+            //console.log(JSON.stringify(error))
+            //console.log(JSON.stringify(error.topics))
+            //console.log(JSON.stringify(error.data))
+
+            if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
+                toast.info('TX_REJECTED_BY_USER')
+                return
+            } else {
+                toast.error(error.message)
+            }
+            // @ts-ignore
+            //const revertData = error.data
+
+            //const decodedError = gameContract.interface.parseError(error.data.data)
+
+            console.log(`Transaction failed:`)
+            //console.log({ decodedError })
+        }
+    }
+
+    async function withdraw() {
+        if (!address) {
+            toast.info('Please connect wallet')
+        }
+        const poolContract = Pool__factory.connect(
+            poolContractAddress,
+            web3Provider!
+        )
+        try {
+            if (
+                await isAllowed(
+                    address!,
+                    assetTokenPlusContractAddress,
+                    web3Provider!,
+                    amount,
+                    poolContractAddress
+                )
+            ) {
+                const result = await poolContract
+                    .connect(web3Provider!.getSigner())
+                    .withdraw(
+                        allowedAssets.indexOf(
+                            allowedAssets.find((x) => x.name === asset)!
+                        ),
+                        ethers.utils.parseUnits(amountTokenPlus.toString(), 6),
+                        { gasLimit: 3000000 } //todo это убрать
+                    )
+                toast.info('Wait for transaction...')
+                await result.wait()
+
+                toast.success(`Withdraw added`)
+                dispatch(
+                    setUserBalance(
+                        await getBalance(
+                            assetContractAddress!,
+                            address!,
+                            web3Provider!
+                        )
+                    )
+                )
+            } else {
+                await increaseAllowance(
+                    assetTokenPlusContractAddress,
+                    web3Provider!,
+                    poolContractAddress
+                )
+            }
+        } catch (error: any) {
+            console.log({ error })
+            console.log('=========================================')
+            const parsedEthersError = getParsedEthersError(error)
+            console.log({ parsedEthersError })
+            //console.log(JSON.stringify(error))
+            //console.log(JSON.stringify(error.topics))
+            //console.log(JSON.stringify(error.data))
+
+            if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
+                toast.info('TX_REJECTED_BY_USER')
+                return
+            } else {
+                toast.error(error.message)
+            }
+            // @ts-ignore
+            //const revertData = error.data
+
+            //const decodedError = gameContract.interface.parseError(error.data.data)
+
+            console.log(`Transaction failed:`)
+            //console.log({ decodedError })
+        }
     }
     //==
     return (
@@ -101,7 +323,7 @@ const SupplyPage = () => {
                                 {activeTabName}
                             </SettingsTitle>
                             {isMobile && (
-                                <SettingsTitle>{`Balance: ${userBalance}`}</SettingsTitle>
+                                <SettingsTitle>{`Balance: ${userBalance} ${asset}; ${tokenPlusBalance} ${asset}+`}</SettingsTitle>
                             )}
                         </TitleContainer>
                         <div className="input-wrapper">
@@ -111,11 +333,19 @@ const SupplyPage = () => {
                                 type="number"
                                 className="input"
                                 placeholder="Amount"
+                                value={amount}
+                                onChange={(e) =>
+                                    setInputValue(
+                                        Number.parseFloat(e.target.value)
+                                    )
+                                }
                             />
                         </div>
                     </InputWrapper>
                     <InputWrapper disabled>
-                        <SettingsTitle margin="9px">Receive</SettingsTitle>
+                        <SettingsTitle margin="9px">
+                            {activeTabName === 'Supply' ? 'Receive' : 'Send'}
+                        </SettingsTitle>
 
                         <div className="input-wrapper">
                             <SelectWrapper>
@@ -128,17 +358,23 @@ const SupplyPage = () => {
                                 type="number"
                                 className="input"
                                 disabled
-                                value={0}
+                                value={amountTokenPlus}
                             />
                         </div>
                     </InputWrapper>
                 </InputContainer>
                 {!isMobile && (
                     <SettingsTitle margin="24px">
-                        {`Balance: ${userBalance}`}
+                        {`Balance: ${userBalance} ${asset}; ${tokenPlusBalance} ${asset}+`}
                     </SettingsTitle>
                 )}
-                <Btn>Supply {asset}</Btn>
+                <Btn
+                    onClick={() =>
+                        activeTabName === 'Supply' ? deposit() : withdraw()
+                    }
+                >
+                    {activeTabName} {asset}
+                </Btn>
                 <PurchaseWrapper>
                     <PurchaseDataList>
                         <PurchaseDataItem>
@@ -150,11 +386,14 @@ const SupplyPage = () => {
                         <PurchaseDataItem>
                             <SettingsTitle>Projected APY:</SettingsTitle>
                         </PurchaseDataItem>
+                        <PurchaseDataItem>
+                            <SettingsTitle>{`${asset}+ contract:`}</SettingsTitle>
+                        </PurchaseDataItem>
                     </PurchaseDataList>
                     <PurchaseDataList>
                         <PurchaseDataItem>
                             <SettingsTitle>
-                                1 {asset}=1 {asset}+
+                                1 {asset}={exchangeRate} {asset}+
                                 <InfoIcon />
                             </SettingsTitle>
                         </PurchaseDataItem>
@@ -167,6 +406,12 @@ const SupplyPage = () => {
                         <PurchaseDataItem>
                             <SettingsTitle>
                                 5.79%
+                                <InfoIcon />
+                            </SettingsTitle>
+                        </PurchaseDataItem>
+                        <PurchaseDataItem>
+                            <SettingsTitle>
+                                {assetTokenPlusContractAddress}
                                 <InfoIcon />
                             </SettingsTitle>
                         </PurchaseDataItem>
