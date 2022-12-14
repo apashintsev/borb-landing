@@ -2,6 +2,7 @@ import * as React from 'react'
 import { BorbGame__factory } from '../../../@types/contracts/BorbGame__factory'
 import { useWeb3Context } from '../../../context/Web3Context'
 import { useAppSelector } from '../../../hooks/redux'
+import { useUserNotifications } from '../../../hooks/useUserNotifications'
 import { useOnClickOutside } from '../../../lib/useOnClickOutside'
 import {
     Column,
@@ -14,6 +15,7 @@ import {
 } from './main'
 
 export function PopupWindow() {
+    useUserNotifications()
     const { web3Provider, address } = useWeb3Context()
     const { asset, gameContractAddress } = useAppSelector(
         (state) => state.gameSlice

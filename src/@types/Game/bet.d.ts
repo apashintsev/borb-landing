@@ -11,4 +11,5 @@ export interface BetVm {
     lockedAt: string
     points: number[]
     lineColorGreen: boolean
+    closePrice: number
 }

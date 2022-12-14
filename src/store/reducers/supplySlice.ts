@@ -2,10 +2,10 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { BigNumber, ethers } from 'ethers'
 
 export const initialState = {
-    assetTokenPlusContractAddress: '',
+    assetTokenPlusContractAddress: ethers.constants.AddressZero,
     tokenPlusBalance: BigNumber.from(0),
-    buyPrice: BigNumber.from(100),
-    sellPrice: BigNumber.from(100),
+    buyPrice: BigNumber.from(ethers.utils.parseUnits('100', 6)),
+    sellPrice: BigNumber.from(ethers.utils.parseUnits('100', 6)),
 }
 export const supplySlice = createSlice({
     name: 'supply',

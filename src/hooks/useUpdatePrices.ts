@@ -18,7 +18,7 @@ export interface NewPriceInUsdVm {
 }
 
 export const useUpdatePrices = () => {
-    const { currencyTicker } = useAppSelector((state) => state.gameSlice)
+    const { currency } = useAppSelector((state) => state.gameSlice)
     const { setCurrencyPrice } = gameSlice.actions
     const dispatch = useAppDispatch()
     const [connection, setConnection] = useState<HubConnection>()
@@ -44,8 +44,9 @@ export const useUpdatePrices = () => {
                     connection.on(
                         'NewPriceSetted',
                         (payload: NewPriceInUsdVm) => {
+                            //todo destructurize /player?course=JS&lessonId=63297a9684ab95f41e81c175
                             const newPrice = Object.entries(payload).find(
-                                (x) => x[0].toUpperCase() == currencyTicker
+                                (x) => x[0].toUpperCase() == currency.ticker
                             )?.[1]
                             dispatch(setCurrencyPrice(newPrice))
                         }

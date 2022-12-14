@@ -1,7 +1,8 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { ApiResult } from '../../@types/ApiResponse'
-import { BetVm } from '../../@types/Game/bet'
-import { ListResponse } from '../../@types/ListResponse'
+import { createAsyncThunk } from "@reduxjs/toolkit"
+import { ApiResponse } from "../../@types/ApiResponse"
+import { BetVm } from "../../@types/Game/bet"
+import { ListResponse } from "../../@types/ListResponse"
+import { axiosClient } from "./axiosClient"
 
 interface IBetsRequest {
     asset: string
@@ -10,38 +11,28 @@ interface IBetsRequest {
     pageNumber: number
     pageSize?: number
 }
+export const getActiveBets = createAsyncThunk<ApiResponse<ListResponse<BetVm>>, IBetsRequest>('history/getActiveBets', async (args, thunkAPI) => {
+    const response = await axiosClient.get<ApiResponse<ListResponse<BetVm>>>('/api/bets/getActive', {
+        params: {
+            asset: args.asset,
+            address: args.address,
+            timeframe: args.timeframe,
+            pageNumber: args.pageNumber,
+            pageSize: args.pageSize ?? 2,
+        },
+    })
+    return response.data
+})
 
-export const betsApi = createApi({
-    reducerPath: 'api/bets',
-    baseQuery: fetchBaseQuery({
-        baseUrl: process.env.REACT_APP_BACKEND_URI! + '/api',
-    }),
-    endpoints: (build) => ({
-        getActive: build.query<ListResponse<BetVm>, IBetsRequest>({
-            query: ({
-                asset,
-                address,
-                timeframe,
-                pageNumber,
-                pageSize = 10,
-            }) => ({
-                url: 'bets/getActive',
-                params: {
-                    asset,
-                    address,
-                    timeframe,
-                    pageNumber,
-                    pageSize,
-                },
-            }),
-        }),
-        getClosed: build.query<ListResponse<BetVm>, IBetsRequest>({
-            query: ({ asset, address, timeframe, pageNumber, pageSize = 10 }) =>
-                `bets/getClosed?asset=${asset}&address=${address}&timeframe=${timeframe}&pageNumber=${pageNumber}&pageSize=${pageSize}`,
-        }),
-        getUncollected: build.query<ListResponse<BetVm>, IBetsRequest>({
-            query: ({ asset, address, timeframe, pageNumber, pageSize = 10 }) =>
-                `bets/getUncollected?asset=${asset}&address=${address}&timeframe=${timeframe}&pageNumber=${pageNumber}&pageSize=${pageSize}`,
-        }),
-    }),
+export const getClosedBets = createAsyncThunk<ApiResponse<ListResponse<BetVm>>, IBetsRequest>('history/getClosedBets', async (args, thunkAPI) => {
+    const response = await axiosClient.get<ApiResponse<ListResponse<BetVm>>>('/api/bets/getClosed', {
+        params: {
+            asset: args.asset,
+            address: args.address,
+            timeframe: args.timeframe,
+            pageNumber: args.pageNumber,
+            pageSize: args.pageSize ?? 2,
+        },
+    })
+    return response.data
 })

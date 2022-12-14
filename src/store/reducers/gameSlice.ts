@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { BigNumber, ethers } from 'ethers'
 import {
-    Asset,
+    AssetTicker,
     CurrencyTicker,
     Timeframe,
     TimeframeName,
@@ -14,30 +14,26 @@ import {
 
 export const initialState = {
     ref: ethers.constants.AddressZero,
-    asset: 'USDT' as Asset,
-    assetImg: '/images/earn/usdt_logo.svg' as string,
+    asset: allowedAssets[0],
     userBalance: BigNumber.from(0),
-    gameContractAddress: process.env.REACT_APP_GAME_CONTRACT! as string,
+    gameContractAddress: process.env.REACT_APP_GAME_CONTRACT!,
     poolContractAddress: process.env.REACT_APP_POOL_CONTRACT!,
-    assetContractAddress: '' as string,
-    currentRewardPercent: 86,
-    selectedTimeframe: { name: '5m', value: 300 } as Timeframe,
-    currencyTicker: 'BTC' as CurrencyTicker,
-    currencyImg: '/images/home/bitcoin.svg' as string,
+    assetContractAddress: ethers.constants.AddressZero,
+    rewardPercent: 86,
+    timeframe: allowedTimeframes[0],
+    currency: allowedCurrencies[0],
     currencyPrice: 25000 as number,
     activeBetsCount: 0, //TODO
     closedBetsCount: 0, //TODO
-    uncollectedBetsCount: 0, //TODO
 }
 export const gameSlice = createSlice({
     name: 'game',
     initialState,
     reducers: {
-        setAsset(state, action: PayloadAction<Asset>) {
-            state.asset = action.payload
-            state.assetImg = allowedAssets.find(
-                (x) => x.name === action.payload
-            )?.img!
+        setAsset(state, action: PayloadAction<AssetTicker>) {
+            state.asset =
+                allowedAssets.find((x) => x.name === action.payload) ??
+                allowedAssets[0]
         },
         setAssetContract(state, action: PayloadAction<string>) {
             state.assetContractAddress = action.payload
@@ -46,24 +42,29 @@ export const gameSlice = createSlice({
             state.userBalance = action.payload
         },
         setRewardPercent(state, action: PayloadAction<number>) {
-            state.currentRewardPercent = action.payload
+            state.rewardPercent = action.payload
         },
         setTimeframe(state, action: PayloadAction<TimeframeName>) {
-            state.selectedTimeframe = allowedTimeframes.find(
+            state.timeframe = allowedTimeframes.find(
                 (x) => x.name === action.payload
             )!
         },
         setCurrency(state, action: PayloadAction<CurrencyTicker>) {
-            state.currencyTicker = action.payload
-            state.currencyImg = allowedCurrencies.find(
-                (x) => x.ticker === action.payload
-            )?.img!
+            state.currency =
+                allowedCurrencies.find((x) => x.ticker === action.payload) ??
+                allowedCurrencies[0]
         },
         setCurrencyPrice(state, action: PayloadAction<number>) {
             state.currencyPrice = action.payload
         },
         setRef(state, action: PayloadAction<string>) {
             state.ref = action.payload
+        },
+        setActiveBetsCount(state, action: PayloadAction<number>) {
+            state.activeBetsCount = action.payload
+        },
+        setClosedBetsCount(state, action: PayloadAction<number>) {
+            state.closedBetsCount = action.payload
         },
     },
 })

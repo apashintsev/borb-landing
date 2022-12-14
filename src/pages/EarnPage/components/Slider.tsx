@@ -25,49 +25,45 @@ export function Slider() {
     }, [tablet, mobile])
 
     const [balances, setBalances] = useState<number[]>([0, 0])
+    const [reload, setReload] = useState<number>(0)
 
     useEffect(() => {
         // Using an IIFE
         ;(async function anyNameFunction() {
             if (!web3Provider) return
 
-            const poolContract = Pool__factory.connect(
-                poolContractAddress,
-                web3Provider!
-            )
-            const newBalances: number[] = []
+            const poolContract = Pool__factory.connect(poolContractAddress, web3Provider!)
+            let newBalances: number[] = []
             try {
-                allowedAssets.forEach(async (x) => {
-                    const balance = await poolContract.referalBalanceOf(
-                        x.id,
-                        address!
-                    )
-                    newBalances.push(
-                        Number.parseFloat(ethers.utils.formatUnits(balance, 6))
-                    )
-                })
-                console.log({ newBalances })
-                setBalances(newBalances)
+                for (let i = 0; i < allowedAssets.length; i++) {
+                    const balance = await poolContract.referalBalanceOf(i, address!)
+                    newBalances[i] = Number.parseFloat(ethers.utils.formatUnits(balance, 6))
+                }
+                setBalances([...newBalances])
             } catch (e: any) {
                 console.error(e)
             }
         })()
-    }, [address])
+    }, [address, reload])
 
     async function claim(assetId: number) {
-        const poolContract = Pool__factory.connect(
-            poolContractAddress,
-            web3Provider!
-        )
+        if (balances[assetId] == 0) {
+            toast.info('Nothing to claim')
+            return
+        }
+        const poolContract = Pool__factory.connect(poolContractAddress, web3Provider!)
         try {
-            const result = await poolContract
-                .connect(web3Provider!.getSigner())
-                .claimReward(
-                    assetId,
-                    { gasLimit: 3000000 } //todo это убрать
-                )
-            toast.info('Wait for transaction...')
-            await result.wait()
+            const result = await poolContract.connect(web3Provider!.getSigner()).claimReward(
+                assetId,
+                { gasLimit: 3000000 } //todo это убрать
+            )
+            toast
+                .promise(result.wait(), {
+                    pending: 'Claiming reward',
+                    success: 'Reward claimed 👌',
+                    error: 'Error 🤯',
+                })
+                .then((_) => setReload((prev) => prev + 1))
         } catch (e: any) {
             console.error(e)
         }
@@ -76,7 +72,6 @@ export function Slider() {
     return (
         <div className="swiper">
             <Swiper
-                // onSlideChange={}
                 spaceBetween={16}
                 onInit={(v) => {
                     swiperRef.current = v.el
@@ -86,7 +81,6 @@ export function Slider() {
                 observer={true}
                 noSwiping={false}
                 noSwipingClass={'swiper-slide'}
-                // style={{ padding: '0 20px' }}
             >
                 <SwiperSlide key={0}>
                     <ReferalBlock />
@@ -98,9 +92,9 @@ export function Slider() {
                                 <img src={asset.img} alt={asset.name} />
                                 <RowText>{asset.name}</RowText>
                             </Row>
-                            <CardContentText>{`$ ${balances[_idx]}`}</CardContentText>
+                            <CardContentText>{`$ ${balances[asset.id] ?? 0}`}</CardContentText>
                             <CardSubLink>
-                                <p onClick={() => claim(_idx)}>Claim</p>
+                                <p onClick={() => claim(asset.id)}>Claim</p>
                                 <img src="/images/earn/arrow.svg" alt="Claim" />
                             </CardSubLink>
                         </Card>

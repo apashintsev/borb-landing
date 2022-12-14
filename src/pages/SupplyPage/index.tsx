@@ -12,142 +12,69 @@ import { gameSlice } from '../../store/reducers/gameSlice'
 import { ethers } from 'ethers'
 import { SelectAsset } from '../HomePage/components/SelectAsset'
 import { Pool__factory } from '../../@types/contracts/Pool__factory'
-import {
-    getBalance,
-    increaseAllowance,
-    isAllowed,
-} from '../../store/api/contracts'
+import { getBalance, increaseAllowance, isAllowed } from '../../store/api/contracts'
 import { supplySlice } from '../../store/reducers/supplySlice'
 import { allowedAssets } from '../../lib/data'
 import { toast } from 'react-toastify'
 import { getParsedEthersError } from '@enzoferey/ethers-error-parser'
 
 type ActiveTab = 'Supply' | 'Withdraw'
+const ERROR_CODE_TX_REJECTED_BY_USER = 4001
+
 const SupplyPage = () => {
     const isMobile = useMediaQuery('(max-width: 768px)')
-    const [popup, setPopup] = useState(false)
-    const [itemId, setItemId] = useState(0)
-    const reff = useRef(null)
-    useOnClickOutside(reff, () => setPopup(false))
-    //==
     const [amount, setAmount] = useState<number>(0)
     const [amountTokenPlus, setAmountTokenPlus] = useState<number>(0)
     const [activeTabName, setActiveTabName] = useState<ActiveTab>('Supply')
 
     const { web3Provider, address } = useWeb3Context()
-    const {
-        asset,
-        assetImg,
-        gameContractAddress,
-        assetContractAddress,
-        poolContractAddress,
-        userBalance,
-    } = useAppSelector((state) => state.gameSlice)
-    const {
-        assetTokenPlusContractAddress,
-        tokenPlusBalance,
-        buyPrice,
-        sellPrice,
-    } = useAppSelector((state1) => state1.supplySlice)
-    const { setAsset, setAssetContract, setUserBalance } = gameSlice.actions
-    const {
-        setAssetTokenPlusContract,
-        setBuyPrice,
-        setSellPrice,
-        setTokenPlusBalance,
-    } = supplySlice.actions
+    const { asset, gameContractAddress, assetContractAddress, poolContractAddress, userBalance } = useAppSelector((state) => state.gameSlice)
+    const { assetTokenPlusContractAddress, tokenPlusBalance, buyPrice, sellPrice } = useAppSelector((state1) => state1.supplySlice)
+    const { setAssetContract, setUserBalance } = gameSlice.actions
+    const { setAssetTokenPlusContract, setBuyPrice, setSellPrice, setTokenPlusBalance } = supplySlice.actions
     const dispatch = useAppDispatch()
-    const ERROR_CODE_TX_REJECTED_BY_USER = 4001
-    const exchangeRate =
-        (activeTabName === 'Supply' ? buyPrice : sellPrice).toNumber() / 100
+    const [reload, setReload] = useState<number>(0)
+    const exchangeRate = Number.parseFloat(ethers.utils.formatUnits(activeTabName === 'Supply' ? buyPrice : sellPrice, 6)) / 100
+
     useEffect(() => {
         // Using an IIFE
         ;(async function anyNameFunction() {
             if (!web3Provider) return
 
-            const gameContract = BorbGame__factory.connect(
-                gameContractAddress,
-                web3Provider!
-            )
-            const poolContract = Pool__factory.connect(
-                poolContractAddress,
-                web3Provider!
-            )
+            const gameContract = BorbGame__factory.connect(gameContractAddress, web3Provider!)
+            const poolContract = Pool__factory.connect(poolContractAddress, web3Provider!)
             try {
-                const assetAddress = await gameContract.getAssetAddress(asset)
+                const assetAddress = await gameContract.getAssetAddress(asset.name)
                 dispatch(setAssetContract(assetAddress))
-                const tokenPlusAddress =
-                    await poolContract.getAssetTokenPlusAddress(asset)
+                const tokenPlusAddress = await poolContract.getAssetTokenPlusAddress(asset.name)
                 dispatch(setAssetTokenPlusContract(tokenPlusAddress))
-                if (
-                    assetAddress !== ethers.constants.AddressZero &&
-                    tokenPlusAddress !== ethers.constants.AddressZero &&
-                    !!address
-                ) {
-                    dispatch(
-                        setUserBalance(
-                            await getBalance(
-                                assetAddress!,
-                                address!,
-                                web3Provider!
-                            )
-                        )
-                    )
+                if (assetAddress !== ethers.constants.AddressZero && tokenPlusAddress !== ethers.constants.AddressZero && !!address) {
+                    dispatch(setUserBalance(await getBalance(assetAddress!, address!, web3Provider!)))
 
-                    dispatch(
-                        setTokenPlusBalance(
-                            await getBalance(
-                                tokenPlusAddress!,
-                                address!,
-                                web3Provider!
-                            )
-                        )
-                    )
+                    dispatch(setTokenPlusBalance(await getBalance(tokenPlusAddress!, address!, web3Provider!)))
 
-                    dispatch(
-                        setBuyPrice(
-                            await poolContract.getTokenPlusBuyPrice(
-                                allowedAssets.indexOf(
-                                    allowedAssets.find((x) => x.name === asset)!
-                                )
-                            )
-                        )
-                    )
+                    dispatch(setBuyPrice(await poolContract.getTokenPlusBuyPrice(asset.id)))
 
-                    dispatch(
-                        setSellPrice(
-                            await poolContract.getTokenPlusSellPrice(
-                                allowedAssets.indexOf(
-                                    allowedAssets.find((x) => x.name === asset)!
-                                )
-                            )
-                        )
-                    )
+                    dispatch(setSellPrice(await poolContract.getTokenPlusSellPrice(asset.id)))
                 }
             } catch (e: any) {
                 console.error(e)
             }
         })()
-    }, [asset, address])
+    }, [asset, address, reload])
 
     async function setInputValue(value: number) {
         try {
-            const balance =
-                activeTabName === 'Supply' ? userBalance : tokenPlusBalance
+            const balance = activeTabName === 'Supply' ? userBalance : tokenPlusBalance
             let newBetValue = ethers.utils.parseUnits(value.toString(), 6)
-            if (
-                value > Number.parseFloat(ethers.utils.formatUnits(balance, 6))
-            ) {
+            if (value > Number.parseFloat(ethers.utils.formatUnits(balance, 6))) {
                 newBetValue = balance
             }
-            const valueN = Math.abs(
-                Number.parseFloat(ethers.utils.formatUnits(newBetValue, 6))
-            )
+            const valueN = Math.abs(Number.parseFloat(ethers.utils.formatUnits(newBetValue, 6)))
             setAmount(valueN)
             setAmountTokenPlus(valueN * exchangeRate)
         } catch {
-            setAmount(0)
-            setAmountTokenPlus(0)
+            clearAmounts()
         }
     }
 
@@ -155,48 +82,25 @@ const SupplyPage = () => {
         if (!address) {
             toast.info('Please connect wallet')
         }
-        const poolContract = Pool__factory.connect(
-            poolContractAddress,
-            web3Provider!
-        )
+        const poolContract = Pool__factory.connect(poolContractAddress, web3Provider!)
         try {
-            if (
-                await isAllowed(
-                    address!,
-                    assetContractAddress!,
-                    web3Provider!,
-                    amount,
-                    poolContractAddress
+            const formattedAmount = ethers.utils.parseUnits(amount.toString(), 6)
+            if (await isAllowed(address!, assetContractAddress!, web3Provider!, formattedAmount, poolContractAddress)) {
+                console.log(ethers.utils.parseUnits(amount.toString(), 6).toString())
+                const result = await poolContract.connect(web3Provider!.getSigner()).makeDeposit(
+                    asset.id,
+                    formattedAmount,
+                    { gasLimit: 3000000 } //todo это убрать
                 )
-            ) {
-                const result = await poolContract
-                    .connect(web3Provider!.getSigner())
-                    .makeDeposit(
-                        allowedAssets.indexOf(
-                            allowedAssets.find((x) => x.name === asset)!
-                        ),
-                        ethers.utils.parseUnits(amount.toString(), 6),
-                        { gasLimit: 3000000 } //todo это убрать
-                    )
-                toast.info('Wait for transaction...')
-                await result.wait()
-
-                toast.success(`Deposit added`)
-                dispatch(
-                    setUserBalance(
-                        await getBalance(
-                            assetContractAddress!,
-                            address!,
-                            web3Provider!
-                        )
-                    )
-                )
+                toast
+                    .promise(result.wait(), {
+                        pending: 'Depositing',
+                        success: 'Deposit added 👌',
+                        error: 'Error 🤯',
+                    })
+                    .then((_) => setReload((prev) => prev + 1))
             } else {
-                await increaseAllowance(
-                    assetContractAddress,
-                    web3Provider!,
-                    poolContractAddress
-                )
+                await increaseAllowance(assetContractAddress, web3Provider!, poolContractAddress)
             }
         } catch (error: any) {
             console.log({ error })
@@ -227,48 +131,24 @@ const SupplyPage = () => {
         if (!address) {
             toast.info('Please connect wallet')
         }
-        const poolContract = Pool__factory.connect(
-            poolContractAddress,
-            web3Provider!
-        )
+        const poolContract = Pool__factory.connect(poolContractAddress, web3Provider!)
         try {
-            if (
-                await isAllowed(
-                    address!,
-                    assetTokenPlusContractAddress,
-                    web3Provider!,
-                    amount,
-                    poolContractAddress
+            const formattedAmount = ethers.utils.parseUnits(amountTokenPlus.toFixed(6).toString(), 6)
+            if (await isAllowed(address!, assetTokenPlusContractAddress, web3Provider!, formattedAmount, poolContractAddress)) {
+                const result = await poolContract.connect(web3Provider!.getSigner()).withdraw(
+                    asset.id,
+                    formattedAmount,
+                    { gasLimit: 3000000 } //todo это убрать
                 )
-            ) {
-                const result = await poolContract
-                    .connect(web3Provider!.getSigner())
-                    .withdraw(
-                        allowedAssets.indexOf(
-                            allowedAssets.find((x) => x.name === asset)!
-                        ),
-                        ethers.utils.parseUnits(amountTokenPlus.toString(), 6),
-                        { gasLimit: 3000000 } //todo это убрать
-                    )
-                toast.info('Wait for transaction...')
-                await result.wait()
-
-                toast.success(`Withdraw added`)
-                dispatch(
-                    setUserBalance(
-                        await getBalance(
-                            assetContractAddress!,
-                            address!,
-                            web3Provider!
-                        )
-                    )
-                )
+                toast
+                    .promise(result.wait(), {
+                        pending: 'Withdrawing',
+                        success: 'Withdrawed 👌',
+                        error: 'Error 🤯',
+                    })
+                    .then((_) => setReload((prev) => prev + 1))
             } else {
-                await increaseAllowance(
-                    assetTokenPlusContractAddress,
-                    web3Provider!,
-                    poolContractAddress
-                )
+                await increaseAllowance(assetTokenPlusContractAddress, web3Provider!, poolContractAddress)
             }
         } catch (error: any) {
             console.log({ error })
@@ -294,86 +174,73 @@ const SupplyPage = () => {
             //console.log({ decodedError })
         }
     }
-    //==
+
+    const changeTab = (tabName: ActiveTab) => {
+        setActiveTabName(tabName)
+        clearAmounts()
+    }
+
+    const clearAmounts = () => {
+        setAmount(0)
+        setAmountTokenPlus(0)
+    }
+
     return (
         <StyledSupply>
             <div className="container">
                 <Title>Supply crypto and earn interest</Title>
-                <Subtitle>
-                    Supply your tokens and get Token+ while earning interest
-                </Subtitle>
+                <Subtitle>Supply your tokens and get Token+ while earning interest</Subtitle>
                 <TabContainer>
-                    <Tab
-                        active={activeTabName === 'Supply'}
-                        onClick={() => setActiveTabName('Supply')}
-                    >
+                    <Tab active={activeTabName === 'Supply'} onClick={() => changeTab('Supply')}>
                         <span>Supply</span>
                     </Tab>
-                    <Tab
-                        active={activeTabName === 'Withdraw'}
-                        onClick={() => setActiveTabName('Withdraw')}
-                    >
+                    <Tab active={activeTabName === 'Withdraw'} onClick={() => changeTab('Withdraw')}>
                         <span>Withdraw</span>
                     </Tab>
                 </TabContainer>
                 <InputContainer>
                     <InputWrapper>
                         <TitleContainer>
-                            <SettingsTitle margin="9px">
-                                {activeTabName}
-                            </SettingsTitle>
+                            <SettingsTitle margin="9px">{activeTabName}</SettingsTitle>
                             {isMobile && (
-                                <SettingsTitle>{`Balance: ${userBalance} ${asset}; ${tokenPlusBalance} ${asset}+`}</SettingsTitle>
+                                <SettingsTitle>{`Balance: ${ethers.utils.formatUnits(userBalance, 6)} ${asset.name}; ${ethers.utils.formatUnits(
+                                    tokenPlusBalance,
+                                    6
+                                )} ${asset.name}+`}</SettingsTitle>
                             )}
                         </TitleContainer>
                         <div className="input-wrapper">
                             <SelectAsset />
-
                             <input
                                 type="number"
                                 className="input"
                                 placeholder="Amount"
                                 value={amount}
-                                onChange={(e) =>
-                                    setInputValue(
-                                        Number.parseFloat(e.target.value)
-                                    )
-                                }
+                                onChange={(e) => setInputValue(Number.parseFloat(e.target.value))}
                             />
                         </div>
                     </InputWrapper>
                     <InputWrapper disabled>
-                        <SettingsTitle margin="9px">
-                            {activeTabName === 'Supply' ? 'Receive' : 'Send'}
-                        </SettingsTitle>
+                        <SettingsTitle margin="9px">{activeTabName === 'Supply' ? 'Receive' : 'Send'}</SettingsTitle>
 
                         <div className="input-wrapper">
                             <SelectWrapper>
                                 <CurrencyWrapper>
-                                    <img src={assetImg} alt={asset} />
+                                    <img src={asset.img} alt={asset.name} />
                                 </CurrencyWrapper>
-                                <span>{`${asset}+`}</span>
+                                <span>{`${asset.name}+`}</span>
                             </SelectWrapper>
-                            <input
-                                type="number"
-                                className="input"
-                                disabled
-                                value={amountTokenPlus}
-                            />
+                            <input type="number" className="input" disabled value={amountTokenPlus} />
                         </div>
                     </InputWrapper>
                 </InputContainer>
                 {!isMobile && (
-                    <SettingsTitle margin="24px">
-                        {`Balance: ${userBalance} ${asset}; ${tokenPlusBalance} ${asset}+`}
-                    </SettingsTitle>
+                    <SettingsTitle>{`Balance: ${ethers.utils.formatUnits(userBalance, 6)} ${asset.name}; ${ethers.utils.formatUnits(tokenPlusBalance, 6)} ${
+                        asset.name
+                    }+`}</SettingsTitle>
                 )}
-                <Btn
-                    onClick={() =>
-                        activeTabName === 'Supply' ? deposit() : withdraw()
-                    }
-                >
-                    {activeTabName} {asset}
+                <Btn onClick={() => (activeTabName === 'Supply' ? deposit() : withdraw())}>
+                    {activeTabName} {asset.name}
                 </Btn>
                 <PurchaseWrapper>
                     <PurchaseDataList>
@@ -387,13 +254,13 @@ const SupplyPage = () => {
                             <SettingsTitle>Projected APY:</SettingsTitle>
                         </PurchaseDataItem>
                         <PurchaseDataItem>
-                            <SettingsTitle>{`${asset}+ contract:`}</SettingsTitle>
+                            <SettingsTitle>{`${asset.name}+ contract:`}</SettingsTitle>
                         </PurchaseDataItem>
                     </PurchaseDataList>
                     <PurchaseDataList>
                         <PurchaseDataItem>
                             <SettingsTitle>
-                                1 {asset}={exchangeRate} {asset}+
+                                1 {asset.name}={exchangeRate} {asset.name}+
                                 <InfoIcon />
                             </SettingsTitle>
                         </PurchaseDataItem>
@@ -410,7 +277,7 @@ const SupplyPage = () => {
                             </SettingsTitle>
                         </PurchaseDataItem>
                         <PurchaseDataItem>
-                            <SettingsTitle>
+                            <SettingsTitle cursorPointer={true} onClick={() => navigator.clipboard.writeText(assetTokenPlusContractAddress)}>
                                 {assetTokenPlusContractAddress}
                                 <InfoIcon />
                             </SettingsTitle>
@@ -492,8 +359,7 @@ export const Tab = styled.div<{ active?: boolean }>`
     position: relative;
     cursor: pointer;
 
-    border-bottom: ${(props) =>
-        props.active ? '2px solid #3fe7be' : '2px solid transparent'};
+    border-bottom: ${(props) => (props.active ? '2px solid #3fe7be' : '2px solid transparent')};
 
     span {
         color: ${(props) => (props.active ? '#3fe7be' : '#8a8f99')};
@@ -513,7 +379,7 @@ export const Tab = styled.div<{ active?: boolean }>`
     }
 `
 
-export const SettingsTitle = styled.span<{ margin?: string }>`
+export const SettingsTitle = styled.span<{ margin?: string; cursorPointer?: boolean }>`
     font-family: 'Inter';
     font-weight: 400;
     font-size: 14px;
@@ -521,6 +387,7 @@ export const SettingsTitle = styled.span<{ margin?: string }>`
     margin-bottom: ${(props) => props.margin ?? '0px'};
     color: #8a8f99;
     display: flex;
+    cursor: ${(props) => (props.cursorPointer ? 'pointer' : '	default')};
 
     svg {
         margin-left: 8px;
@@ -557,19 +424,13 @@ export const InputWrapper = styled.div<{ disabled?: boolean }>`
         position: relative;
         width: 340px;
         border: 1px solid #e9ecf2;
-        border: ${({ disabled, theme }) =>
-            disabled
-                ? `1px solid ${theme.inputDisabledBorderColor}`
-                : `1px solid ${theme.inputBorderColor}`};
+        border: ${({ disabled, theme }) => (disabled ? `1px solid ${theme.inputDisabledBorderColor}` : `1px solid ${theme.inputBorderColor}`)};
 
         border-radius: 8px;
         padding: 12px;
         display: flex;
 
-        background-color: ${({ disabled, theme }) =>
-            disabled
-                ? theme.inputWrapperDisabledColor
-                : theme.inputWrapperColor};
+        background-color: ${({ disabled, theme }) => (disabled ? theme.inputWrapperDisabledColor : theme.inputWrapperColor)};
 
         @media screen and (max-width: 786px) {
             width: 100%;

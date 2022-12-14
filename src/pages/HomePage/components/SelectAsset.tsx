@@ -2,14 +2,16 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 import { allowedAssets } from '../../../lib/data'
+import { useOnClickOutside } from '../../../lib/useOnClickOutside'
 import { gameSlice } from '../../../store/reducers/gameSlice'
 
 export function SelectAsset() {
-    const { asset, assetImg } = useAppSelector((state) => state.gameSlice)
+    const { asset } = useAppSelector((state) => state.gameSlice)
     const { setAsset } = gameSlice.actions
     const dispatch = useAppDispatch()
     const [popup, setPopup] = React.useState<boolean>(false)
     let ref2 = React.useRef(null)
+    useOnClickOutside(ref2, () => setPopup(false))
     return (
         <>
             <SelectWrapper
@@ -18,17 +20,10 @@ export function SelectAsset() {
                 }}
             >
                 <CurrencyWrapper>
-                    <img src={assetImg} alt={asset} />
+                    <img src={asset.img} alt={asset.name} />
                 </CurrencyWrapper>
-                <span>{asset}</span>
-                <svg
-                    width="16"
-                    height="16"
-                    viewBox="0 0 16 16"
-                    fill="none"
-                    className="arrow"
-                    xmlns="http://www.w3.org/2000/svg"
-                >
+                <span>{asset.name}</span>
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="arrow" xmlns="http://www.w3.org/2000/svg">
                     <path d="M8 10L5 6L11 6L8 10Z" fill="#23272B" />
                 </svg>
             </SelectWrapper>

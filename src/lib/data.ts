@@ -1,13 +1,13 @@
-import { Asset, CurrencyTicker, Timeframe } from '../@types/Game/game'
+import { AssetTicker, CurrencyTicker, Timeframe } from '../@types/Game/game'
 
-interface AllowedCurrencies {
+export interface Currency {
     id: number
     name: string
     ticker: CurrencyTicker
     img: string
 }
 
-export let allowedCurrencies: AllowedCurrencies[] = [
+export let allowedCurrencies: Currency[] = [
     {
         id: 0,
         name: 'Bitcoin',
@@ -70,20 +70,20 @@ export let allowedCurrencies: AllowedCurrencies[] = [
     },
 ]
 
-interface AllowedAssets {
-    id:number
-    name: Asset
+export interface Asset {
+    id: number
+    name: AssetTicker
     img: string
 }
 
-export const allowedAssets: AllowedAssets[] = [
+export const allowedAssets: Asset[] = [
     {
-        id:0,
+        id: 0,
         name: 'USDT',
         img: '/images/earn/usdt_logo.svg',
     },
     {
-        id:1,
+        id: 1,
         name: 'USDC',
         img: '/images/earn/usdc_logo.svg',
     },
@@ -97,4 +97,6 @@ export const allowedTimeframes: Timeframe[] = [
     { name: '4h', value: 4 * 60 * 60 },
     { name: '24h', value: 24 * 60 * 60 },
 ]
+
+
 export const regexEthAddress = /(0x[A-Fa-f0-9]{40})/g

@@ -1,102 +1,86 @@
-import { Pagination, Title } from '../components/bottom'
+import { Title } from '../components/bottom'
 import { Tab, TabContainer } from '../../SupplyPage'
 import styled from 'styled-components'
 import { useEffect, useState } from 'react'
-import { BetVm } from '../../../@types/Game/bet'
 import { BetItem } from './BetItem'
-import { betsApi } from '../../../store/api/bets'
-import { useAppSelector } from '../../../hooks/redux'
-import { allowedTimeframes } from '../../../lib/data'
+import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 import { useWeb3Context } from '../../../context/Web3Context'
+import { getActiveBets, getClosedBets } from '../../../store/api/bets'
+import Pagination from '../../../components/Pagination/Pagination'
+import { Spinner } from '../../../components/Spinner/Spinner'
 
-type ActiveTab = 'Active' | 'Closed' | 'Uncollected'
-
-interface IPagesSettings {
-    totalCount: number
-    pageSize: number
-    currentPage: number
-    totalPages: number
-    hasPrevious: boolean
-    hasNext: boolean
-}
+type ActiveTab = 'Active' | 'Closed'
 
 export function History() {
     const { address } = useWeb3Context()
-    const { asset, selectedTimeframe } = useAppSelector(
-        (state) => state.gameSlice
-    )
-    const [currentPage, setCurrentPage] = useState(0)
-    const { data: dataActive } = betsApi.useGetActiveQuery({
-        asset: asset,
-        address: address!,
-        timeframe: allowedTimeframes.find(
-            (x) => x.name === selectedTimeframe.name
-        )!.value,
-        pageNumber: currentPage,
-    })
-    const { data: dataClosed } = betsApi.useGetClosedQuery({
-        asset: asset,
-        address: address!,
-        timeframe: allowedTimeframes.find(
-            (x) => x.name === selectedTimeframe.name
-        )!.value,
-        pageNumber: currentPage,
-    })
-    const { data: dataUncollected } = betsApi.useGetUncollectedQuery({
-        asset: asset,
-        address: address!,
-        timeframe: allowedTimeframes.find(
-            (x) => x.name === selectedTimeframe.name
-        )!.value,
-        pageNumber: currentPage,
-    })
+    const { asset, timeframe } = useAppSelector((state) => state.gameSlice)
+    const { activeBets, closedBets } = useAppSelector((state) => state.historySlice)
 
+    const dispatch = useAppDispatch()
+
+    const [currentPageActive, setCurrentPageActive] = useState(0)
+    const [currentPageClosed, setCurrentPageClosed] = useState(0)
     const [activeTabName, setActiveTabName] = useState<ActiveTab>('Active')
 
     const setActiveTab = (tabName: ActiveTab) => {
         setActiveTabName(tabName)
-        setCurrentPage(0)
     }
 
-    const getBetList = (): BetVm[] | undefined => {
-        if (activeTabName === 'Closed') return dataClosed?.data
-        if (activeTabName === 'Uncollected') return dataUncollected?.data
-        return dataActive?.data
+    const setCurrentPage = (diff: number) => {
+        activeTabName === 'Active'
+            ? setCurrentPageActive(currentPageActive + diff)
+            : setCurrentPageClosed(currentPageClosed + diff)
     }
 
-    const getPageSettings = (): IPagesSettings => {
-        const val: IPagesSettings =
-            activeTabName === 'Closed'
-                ? { ...dataClosed! }
-                : activeTabName === 'Uncollected'
-                ? { ...dataUncollected! }
-                : { ...dataActive! }
-        return val
+    const getHasPrev = (): boolean => {
+        return (activeTabName === 'Active' ? activeBets : closedBets).hasPrevious
     }
+
+    const getHasNext = (): boolean => {
+        return (activeTabName === 'Active' ? activeBets : closedBets).hasNext
+    }
+    const geIsLoading = (): boolean => {
+        return (activeTabName === 'Active' ? activeBets : closedBets).isLoading
+    }
+
+    useEffect(() => {
+        if (!!address) {
+            dispatch(
+                getActiveBets({
+                    asset: asset.name,
+                    address: address!,
+                    timeframe: timeframe.value,
+                    pageNumber: currentPageActive,
+                })
+            )
+        }
+    }, [address, asset, currentPageActive])
+    useEffect(() => {
+        if (!!address) {
+            dispatch(
+                getClosedBets({
+                    asset: asset.name,
+                    address: address!,
+                    timeframe: timeframe.value,
+                    pageNumber: currentPageClosed,
+                })
+            )
+        }
+    }, [address, asset, currentPageClosed])
 
     return (
         <>
             <Title>Trade</Title>
             <div className="tab_container">
                 <TabContainer>
-                    <Tab
-                        active={activeTabName === 'Active'}
-                        onClick={() => setActiveTab('Active')}
-                    >
-                        <span>Active {<h3>{dataActive?.totalCount}</h3>}</span>
-                    </Tab>
-                    <Tab
-                        active={activeTabName === 'Closed'}
-                        onClick={() => setActiveTab('Closed')}
-                    >
-                        <span>Closed {<h3>{dataClosed?.totalCount}</h3>}</span>
-                    </Tab>
-                    <Tab
-                        active={activeTabName === 'Uncollected'}
-                        onClick={() => setActiveTab('Uncollected')}
-                    >
+                    <Tab active={activeTabName === 'Active'} onClick={() => setActiveTab('Active')}>
                         <span>
-                            Uncollected {<h3>{dataUncollected?.totalCount}</h3>}
+                            Active <h3>{activeBets.count}</h3>
+                        </span>
+                    </Tab>
+                    <Tab active={activeTabName === 'Closed'} onClick={() => setActiveTab('Closed')}>
+                        <span>
+                            Closed <h3>{closedBets.count}</h3>
                         </span>
                     </Tab>
                 </TabContainer>
@@ -111,36 +95,18 @@ export function History() {
                     <span className="last">Result</span>
                 </DataHeader>
 
-                <DataContent>
-                    {getBetList()?.map((bet, _idx) => (
-                        <BetItem bet={bet} key={_idx} />
-                    ))}
-                </DataContent>
+                {!geIsLoading() && (
+                    <DataContent>
+                        {(activeTabName === 'Active' ? activeBets : closedBets)?.bets?.map((bet, _idx) => (
+                            <BetItem bet={bet} key={_idx} />
+                        ))}
+                    </DataContent>
+                )}
+                {geIsLoading() && (
+                    <Spinner/>
+                )}
             </DataTable>
-            <Pagination>
-                <img
-                    style={{
-                        visibility: getPageSettings().hasPrevious
-                            ? 'visible'
-                            : 'hidden',
-                    }}
-                    src="/images/home/pagination.svg"
-                    alt="Previous"
-                    onClick={() => setCurrentPage(currentPage - 1)}
-                />
-
-                <img
-                    style={{
-                        visibility: getPageSettings().hasNext
-                            ? 'visible'
-                            : 'hidden',
-                        transform: 'rotate(180deg)',
-                    }}
-                    src="/images/home/pagination.svg"
-                    alt="Next"
-                    onClick={() => setCurrentPage(currentPage + 1)}
-                />
-            </Pagination>
+            <Pagination hasNext={getHasNext()} hasPrev={getHasPrev()} setPage={setCurrentPage} />
         </>
     )
 }

@@ -1,4 +1,5 @@
 import * as React from 'react'
+import Countdown from 'react-countdown'
 import styled from 'styled-components'
 import { BetVm } from '../../../@types/Game/bet'
 import { allowedCurrencies } from '../../../lib/data'
@@ -16,9 +17,10 @@ export const BetItem: React.FunctionComponent<IBetItemProps> = ({ bet }) => {
         (bet.betType == 0 && bet.lockPrice < lastPrice) ||
         (bet.betType == 1 && bet.lockPrice > lastPrice)
 
-    const datetime = new Date(
-        Date.parse(bet.lockedAt) + bet.timeframe * 1000
-    ).toLocaleString()
+    const datetime = new Date(Date.parse(bet.lockedAt) + bet.timeframe * 1000)
+
+    const countdown = bet.closePrice==0;
+    console.log(bet.closePrice)
 
     return (
         <DataContentItem key={bet.betId}>
@@ -44,7 +46,13 @@ export const BetItem: React.FunctionComponent<IBetItemProps> = ({ bet }) => {
             </span>
             <span className="center">${bet.lockPrice}</span>
 
-            <span className="center">{datetime}</span>
+            <span className="center">
+                {countdown ? (
+                    <Countdown date={new Date(datetime)} renderer={renderer} />
+                ) : (
+                    bet.closePrice
+                )}
+            </span>
             <span className="chart_td center mobile-display-none">
                 <SmallChart data={bet.points} isWin={isWin} />
             </span>
@@ -54,6 +62,17 @@ export const BetItem: React.FunctionComponent<IBetItemProps> = ({ bet }) => {
         </DataContentItem>
     )
 }
+// @ts-ignore
+const renderer = ({ days, hours, minutes, seconds }) => {
+  var d = new Date();
+  var gmtHours = -d.getTimezoneOffset();
+  const totalHours = hours + days * 24; /* + gmtHours*/
+  return (
+    <span>
+      {totalHours}:{minutes}:{seconds}
+    </span>
+  );
+};
 
 const DataContentItem = styled.div`
     display: grid;

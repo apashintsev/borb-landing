@@ -1,3 +1,4 @@
+import { ethers } from 'ethers'
 import { useWeb3Context } from '../../../context/Web3Context'
 import { addressToPointsFormat } from '../../../lib/sharedFunctions'
 import { Card, CardSubLink, Row, RowText, SmallCardContent } from './styles'
@@ -5,7 +6,7 @@ import { Card, CardSubLink, Row, RowText, SmallCardContent } from './styles'
 export function ReferalBlock() {
     const { address } = useWeb3Context()
     const domain = 'borb.fi/' //window.location.protocol + '//' + window.location.host + '/'
-    const referalLink = `?ref=${address}`
+    const referalLink = `?ref=${address??ethers.constants.AddressZero}`
     return (
         <Card>
             <Row>
