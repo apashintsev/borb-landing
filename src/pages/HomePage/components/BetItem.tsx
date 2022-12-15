@@ -3,7 +3,7 @@ import Countdown from 'react-countdown'
 import styled from 'styled-components'
 import { BetVm } from '../../../@types/Game/bet'
 import { allowedCurrencies } from '../../../lib/data'
-import SmallChart from './SmallChart'
+import SmallChart from '../../../components/SmallChart/SmallChart'
 
 export interface IBetItemProps {
     bet: BetVm

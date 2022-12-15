@@ -21,10 +21,12 @@ import { History } from './components/History'
 import { getQueryVariable } from '../../lib/sharedFunctions'
 import { regexEthAddress } from '../../lib/data'
 import { PopupWindow } from './components/Popup'
+import { historySlice } from '../../store/reducers/historySlice'
 
 const Home = () => {
     const { asset } = useAppSelector((state) => state.gameSlice)
     const { setRef } = gameSlice.actions
+    const { refreshClosedBets } = historySlice.actions
     const dispatch = useAppDispatch()
     const [show, setShow] = React.useState<boolean>(false)
     const [popup, setPopup] = React.useState<boolean>(false)
@@ -43,13 +45,9 @@ const Home = () => {
     const handleClick = async () => {
         //setIsLoading(true)
         try {
-            const response = await fetch(
-                process.env.REACT_APP_BACKEND_URI! +
-                    '/api/Settings/ToggleAggregatorIsOn',
-                {
-                    method: 'POST',
-                }
-            )
+            const response = await fetch(process.env.REACT_APP_BACKEND_URI! + '/api/Settings/ToggleAggregatorIsOn', {
+                method: 'POST',
+            })
 
             if (!response.ok) {
                 throw new Error(`Error! status: ${response.status}`)
@@ -69,13 +67,9 @@ const Home = () => {
     const handleClick2 = async () => {
         //setIsLoading(true)
         try {
-            const response = await fetch(
-                process.env.REACT_APP_BACKEND_URI! +
-                    '/api/Settings/GetAggregatorIsOn',
-                {
-                    method: 'Get',
-                }
-            )
+            const response = await fetch(process.env.REACT_APP_BACKEND_URI! + '/api/Settings/GetAggregatorIsOn', {
+                method: 'Get',
+            })
 
             if (!response.ok) {
                 throw new Error(`Error! status: ${response.status}`)
@@ -95,6 +89,12 @@ const Home = () => {
     return (
         <StyledHome>
             <div className="container">
+                <button
+                    style={{ backgroundColor: 'red', marginBottom: '40px' }}
+                    onClick={() => dispatch(refreshClosedBets())}
+                >
+                    reload
+                </button>
                 {/*<button
                     style={{ backgroundColor: 'red', marginBottom:'40px' }}
                     onClick={handleClick}

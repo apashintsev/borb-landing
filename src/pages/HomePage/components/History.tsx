@@ -1,4 +1,3 @@
-import { Title } from '../components/bottom'
 import { Tab, TabContainer } from '../../SupplyPage'
 import styled from 'styled-components'
 import { useEffect, useState } from 'react'
@@ -8,6 +7,7 @@ import { useWeb3Context } from '../../../context/Web3Context'
 import { getActiveBets, getClosedBets } from '../../../store/api/bets'
 import Pagination from '../../../components/Pagination/Pagination'
 import { Spinner } from '../../../components/Spinner/Spinner'
+import { toast } from 'react-toastify'
 
 type ActiveTab = 'Active' | 'Closed'
 
@@ -42,6 +42,9 @@ export function History() {
     const geIsLoading = (): boolean => {
         return (activeTabName === 'Active' ? activeBets : closedBets).isLoading
     }
+    const getErrors = (): string[] => {
+        return (activeTabName === 'Active' ? activeBets : closedBets).errors
+    }
 
     useEffect(() => {
         if (!!address) {
@@ -54,7 +57,7 @@ export function History() {
                 })
             )
         }
-    }, [address, asset, currentPageActive])
+    }, [address, asset, currentPageActive, activeBets.toggleRefresh])
     useEffect(() => {
         if (!!address) {
             dispatch(
@@ -66,7 +69,7 @@ export function History() {
                 })
             )
         }
-    }, [address, asset, currentPageClosed])
+    }, [address, asset, currentPageClosed, closedBets.toggleRefresh])
 
     return (
         <>
@@ -102,14 +105,23 @@ export function History() {
                         ))}
                     </DataContent>
                 )}
-                {geIsLoading() && (
-                    <Spinner/>
-                )}
+                {geIsLoading() && <Spinner />}
+                {getErrors()?.length>0 && toast.error(getErrors().join(','))}
             </DataTable>
             <Pagination hasNext={getHasNext()} hasPrev={getHasPrev()} setPage={setCurrentPage} />
         </>
     )
 }
+
+const Title = styled.div`
+    margin: 48px 0 24px;
+    font-weight: 600;
+    font-size: 24px;
+    color: ${(props) => props.theme.selectColor};
+    @media screen and (max-width: 480px) {
+        padding: 0 16px;
+    }
+`
 
 const DataTable = styled.div`
     span {

@@ -1,23 +1,37 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import Pagination from '../../../components/Pagination/Pagination'
 import { useWeb3Context } from '../../../context/Web3Context'
+import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 import { addressToPointsFormat } from '../../../lib/sharedFunctions'
-import { referalApi } from '../../../store/api/referal'
-import {
-    AdaptiveTable,
-    Item,
-    Pagination,
-    TableGrid,
-    TableHead,
-    TableRow,
-} from './styles'
+import { getRewards } from '../../../store/api/referal'
+import { referalRewardsSlice } from '../../../store/reducers/referalRewardsSlice'
+import { AdaptiveTable, Item, TableGrid, TableHead, TableRow } from './styles'
+import { Spinner } from '../../../components/Spinner/Spinner'
 
 export function RewardTable() {
     const { address } = useWeb3Context()
+    const { rewards, hasNext, hasPrevious, isLoading, errors } = useAppSelector(
+        (state) => state.referalRewardsSlice
+    )
     const [currentPage, setCurrentPage] = useState(0)
-    const { data: dataRewards } = referalApi.useGetRewardsQuery({
-        address: address!,
-        pageNumber: currentPage,
-    })
+
+    const setPage = (diff: number) => {
+        setCurrentPage(currentPage + diff)
+    }
+    
+    const dispatch = useAppDispatch()
+
+    useEffect(() => {
+        if (!!address) {
+            dispatch(
+                getRewards({
+                    address: address!,
+                    pageNumber: currentPage,
+                })
+            )
+        }
+    }, [address, currentPage])
+
     return (
         <>
             <TableGrid>
@@ -27,47 +41,36 @@ export function RewardTable() {
                     <p>Reward earned</p>
                 </div>
                 <TableHead></TableHead>
-                <TableRow>
-                    {dataRewards?.data.map((r) => (
-                        <Item>
+                {!isLoading&& <TableRow>
+                    {rewards?.map((r, idx) => (
+                        <Item key={idx}>
                             <p>{r.walletAddress}</p>
                             <p>{r.asset}</p>
                             <p>${r.rewardEarned}</p>
                         </Item>
                     ))}
-                </TableRow>
+                </TableRow>}
             </TableGrid>
             <AdaptiveTable>
                 <div className="titles">
                     <p>Wallet address</p>
                     <p>Reward earned</p>
                 </div>
-                <div className="content">
-                    {dataRewards?.data.map((r) => (
-                        <div className="row">
+                {!isLoading&& <div className="content">
+                    {rewards?.map((r, idx) => (
+                        <div className="row" key={idx}>
                             <div className="left">
-                                <p>
-                                    {addressToPointsFormat(
-                                        r.walletAddress,
-                                        8,
-                                        41
-                                    )}
-                                </p>
+                                <p>{addressToPointsFormat(r.walletAddress, 8, 41)}</p>
                                 <span>{r.asset}</span>
                             </div>
                             <p className="cost">${r.rewardEarned}</p>
                         </div>
                     ))}
-                </div>
-            </AdaptiveTable>{' '}
-            <Pagination>
-                <img src="/images/earn/earn_pagination.svg" alt="" />
-                <img
-                    src="/images/earn/earn_pagination.svg"
-                    alt=""
-                    style={{ transform: 'rotate(180deg)' }}
-                />
-            </Pagination>
+                </div>}
+            </AdaptiveTable>
+            {isLoading && <Spinner />}
+            {errors?.length > 0 && toast.error(getErrors().join(','))}
+            <Pagination hasNext={hasNext} hasPrev={hasPrevious} setPage={setPage} />
         </>
     )
 }

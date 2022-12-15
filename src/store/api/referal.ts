@@ -1,6 +1,8 @@
-import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
+import { createAsyncThunk } from '@reduxjs/toolkit'
+import { ApiResponse } from '../../@types/ApiResponse'
 import { ReferalRewardVm } from '../../@types/Game/ref'
 import { ListResponse } from '../../@types/ListResponse'
+import { axiosClient } from './axiosClient'
 
 interface IReferalRewardsRequest {
     address: string
@@ -8,24 +10,23 @@ interface IReferalRewardsRequest {
     pageSize?: number
 }
 
-export const referalApi = createApi({
-    reducerPath: 'api/referalrewards',
-    baseQuery: fetchBaseQuery({
-        baseUrl: process.env.REACT_APP_BACKEND_URI! + '/api',
-    }),
-    endpoints: (build) => ({
-        getRewards: build.query<
-            ListResponse<ReferalRewardVm>,
-            IReferalRewardsRequest
-        >({
-            query: ({ address, pageNumber, pageSize = 10 }) => ({
-                url: 'referalrewards/getrewards',
-                params: {
-                    address,
-                    pageNumber,
-                    pageSize,
-                },
-            }),
-        }),
-    }),
-})
+export const getRewards = createAsyncThunk<ApiResponse<ListResponse<ReferalRewardVm>>, IReferalRewardsRequest>(
+    'referalRewards/getRewards',
+    async (args, { rejectWithValue }) => {
+        try {
+            const response = await axiosClient.get<ApiResponse<ListResponse<ReferalRewardVm>>>(
+                '/api/referalRewards/getRewards',
+                {
+                    params: {
+                        address: args.address,
+                        pageNumber: args.pageNumber,
+                        pageSize: args.pageSize ?? 2,
+                    },
+                }
+            )
+            return response.data
+        } catch (err: any) {
+            return rejectWithValue(err.response.data)
+        }
+    }
+)

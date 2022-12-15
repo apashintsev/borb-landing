@@ -1,5 +1,5 @@
 import styled from 'styled-components'
-import { useAppDispatch} from '../hooks/redux'
+import { useAppDispatch } from '../hooks/redux'
 import { appSettings } from '../store/reducers/appSettingsSlice'
 
 const data = [
@@ -105,11 +105,7 @@ const LangaugePopup = () => {
 
             <div className="grid">
                 {data.map((card) => (
-                    <div
-                        key={card.short}
-                        className="card"
-                        onClick={() => dispatch(setIsLangaugePopup(false))}
-                    >
+                    <div key={card.short} className="card" onClick={() => dispatch(setIsLangaugePopup(false))}>
                         <img className="card_img" src={card.url} alt="" />
                         <p>
                             {card.name} &nbsp;-&nbsp; {card.short}

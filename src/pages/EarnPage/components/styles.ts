@@ -181,7 +181,7 @@ const Item = styled.div`
         }
     }
 `
-
+/*
 const Pagination = styled.div`
     display: grid;
     place-content: center;
@@ -197,7 +197,7 @@ const Pagination = styled.div`
     img {
         cursor: pointer;
     }
-`
+`*/
 const AdaptiveTable = styled.div`
     @media screen and (min-width: 480px) {
         display: none;
@@ -252,7 +252,7 @@ const AdaptiveTable = styled.div`
 
 export {
     AdaptiveTable,
-    Pagination,
+   // Pagination,
     Item,
     TableRow,
     TableGrid,

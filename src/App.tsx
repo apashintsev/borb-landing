@@ -1,4 +1,4 @@
-import { useEffect, useRef} from 'react'
+import { useEffect, useRef } from 'react'
 import { Route, Routes } from 'react-router-dom'
 import styled, { ThemeProvider } from 'styled-components'
 import Footer from './components/Footer'
@@ -17,8 +17,7 @@ import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
 const App = () => {
-    const { themeName, themeSettings, isBurger, isLangaugePopup } =
-        useAppSelector((state) => state.appSettings)
+    const { themeName, themeSettings, isBurger, isLangaugePopup } = useAppSelector((state) => state.appSettings)
 
     const appRef = useRef<HTMLDivElement | null>(null)
 
@@ -50,6 +49,7 @@ const App = () => {
                             <Route path="/supply" element={<SupplyPage />} />
                             <Route path="/about" element={<AboutPage />} />
                             <Route path="/earn" element={<EarnPage />} />
+                            <Route path="/about" element={<AboutPage />} />
                         </Routes>
                     </MainContainer>
                     <Footer />

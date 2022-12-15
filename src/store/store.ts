@@ -1,10 +1,9 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import web3Reducer from '../store/reducers/web3Slice'
-//import { betsApi } from './api/bets'
-import { referalApi } from './api/referal'
 import appSettings from './reducers/appSettingsSlice'
 import gameSlice from './reducers/gameSlice'
 import historySlice from './reducers/historySlice'
+import referalRewardsSlice  from './reducers/referalRewardsSlice'
 import supplySlice from './reducers/supplySlice'
 
 const rootReducer = combineReducers({
@@ -13,8 +12,7 @@ const rootReducer = combineReducers({
     gameSlice,
     supplySlice,
     historySlice,
-    //[betsApi.reducerPath]: betsApi.reducer,
-    [referalApi.reducerPath]: referalApi.reducer,
+    referalRewardsSlice,
 })
 
 export const setupStore = () => {
@@ -23,12 +21,8 @@ export const setupStore = () => {
         middleware: (getDefaultMiddleware) =>
             getDefaultMiddleware({
                 thunk: true, immutableCheck: false,
-                /*thunk: {
-          extraArgument: myCustomApiService,
-        },*/
                 serializableCheck: false,
-            }).concat(/*betsApi.middleware, */referalApi.middleware),
-        //.concat(),
+            }),
     })
 }
 

@@ -45,11 +45,7 @@ const Nav = () => {
                                 <p>Trade</p>
                             </StyledLink>
                         </NavLink>
-                        <NavLink
-                            className="need"
-                            to="/earn"
-                            onClick={() => dispatch(setIsBurger(false))}
-                        >
+                        <NavLink className="need" to="/earn" onClick={() => dispatch(setIsBurger(false))}>
                             <svg
                                 width="20"
                                 height="20"
@@ -67,11 +63,7 @@ const Nav = () => {
 
                             <p>Earn</p>
                         </NavLink>
-                        <NavLink
-                            className="need"
-                            to="/supply"
-                            onClick={() => dispatch(setIsBurger(false))}
-                        >
+                        <NavLink className="need" to="/supply" onClick={() => dispatch(setIsBurger(false))}>
                             <svg
                                 width="20"
                                 height="20"
@@ -92,11 +84,7 @@ const Nav = () => {
                     </Block>
                     <Block>
                         <Title>Support</Title>
-                        <NavLink
-                            className="need"
-                            to="/messages"
-                            onClick={() => dispatch(setIsBurger(false))}
-                        >
+                        <NavLink className="need" to="/messages" onClick={() => dispatch(setIsBurger(false))}>
                             <svg
                                 width="20"
                                 height="20"
@@ -114,11 +102,7 @@ const Nav = () => {
 
                             <p>Messages</p>
                         </NavLink>
-                        <NavLink
-                            className="need"
-                            to="/settings"
-                            onClick={() => dispatch(setIsBurger(false))}
-                        >
+                        <NavLink className="need" to="/settings" onClick={() => dispatch(setIsBurger(false))}>
                             <svg
                                 width="20"
                                 height="20"
@@ -136,11 +120,7 @@ const Nav = () => {
                                 </g>
                                 <defs>
                                     <clipPath id="clip0_208_528">
-                                        <rect
-                                            width="20"
-                                            height="20"
-                                            fill="white"
-                                        />
+                                        <rect width="20" height="20" fill="white" />
                                     </clipPath>
                                 </defs>
                             </svg>
@@ -150,7 +130,7 @@ const Nav = () => {
                     </Block>
                     <Block>
                         <Title>About</Title>
-                        <StyledLink stroke="true">
+                        <NavLink className="need" to="/about" onClick={() => dispatch(setIsBurger(false))}>
                             <svg
                                 width="20"
                                 height="20"
@@ -175,7 +155,7 @@ const Nav = () => {
                             </svg>
 
                             <p>Docs</p>
-                        </StyledLink>
+                        </NavLink>
                         <StyledLink>
                             <svg
                                 width="20"
@@ -208,25 +188,13 @@ const Nav = () => {
                 </Language>
                 <Bottom>
                     <Icons>
-                        <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 20 20"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path
                                 d="M10 0C4.47768 0 0 4.47768 0 10C0 15.5223 4.47768 20 10 20C15.5223 20 20 15.5223 20 10C20 4.47768 15.5223 0 10 0ZM14.8058 7.53795C14.8125 7.64286 14.8125 7.75223 14.8125 7.85938C14.8125 11.1362 12.317 14.9107 7.7567 14.9107C6.35045 14.9107 5.04688 14.5022 3.94866 13.7991C4.14955 13.8214 4.34152 13.8304 4.54688 13.8304C5.70759 13.8304 6.77455 13.4375 7.625 12.7723C6.53571 12.75 5.62054 12.0357 5.30804 11.0536C5.68973 11.1094 6.03348 11.1094 6.42634 11.0089C5.86546 10.895 5.36133 10.5904 4.99959 10.1468C4.63785 9.70331 4.44082 9.14823 4.44196 8.57589V8.54464C4.77009 8.72991 5.15625 8.84375 5.56027 8.85938C5.22063 8.63302 4.94209 8.32636 4.74936 7.96658C4.55662 7.60681 4.45563 7.20503 4.45536 6.79688C4.45536 6.33482 4.57589 5.91295 4.79241 5.54688C5.41496 6.31325 6.19181 6.94005 7.07247 7.38653C7.95312 7.83301 8.91788 8.08918 9.90402 8.13839C9.55357 6.45313 10.8125 5.08929 12.3259 5.08929C13.0402 5.08929 13.683 5.38839 14.1362 5.87054C14.6964 5.76562 15.2321 5.5558 15.7098 5.27455C15.5246 5.84821 15.1362 6.33259 14.6205 6.63839C15.1205 6.58482 15.6027 6.44643 16.0491 6.25223C15.7121 6.74777 15.2902 7.1875 14.8058 7.53795Z"
                                 fill="#C2C5CC"
                             />
                         </svg>
-                        <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 20 20"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clipPath="url(#clip0_173_758)">
                                 <path
                                     fillRule="evenodd"
@@ -241,13 +209,7 @@ const Nav = () => {
                                 </clipPath>
                             </defs>
                         </svg>
-                        <svg
-                            width="20"
-                            height="20"
-                            viewBox="0 0 20 20"
-                            fill="none"
-                            xmlns="http://www.w3.org/2000/svg"
-                        >
+                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <g clipPath="url(#clip0_173_757)">
                                 <path
                                     d="M6.83861 10.4444C6.72873 10.6089 6.67008 10.8022 6.67008 11C6.67008 11.1313 6.69595 11.2614 6.7462 11.3827C6.79646 11.504 6.87012 11.6142 6.96298 11.7071C7.05584 11.8 7.16608 11.8736 7.2874 11.9239C7.40873 11.9741 7.53876 12 7.67008 12C7.86787 12 8.06121 11.9413 8.22565 11.8315C8.3901 11.7216 8.51828 11.5654 8.59396 11.3827C8.66965 11.2 8.68946 10.9989 8.65087 10.8049C8.61228 10.6109 8.51704 10.4327 8.37719 10.2929C8.23734 10.153 8.05916 10.0578 7.86517 10.0192C7.67119 9.98063 7.47013 10.0004 7.2874 10.0761C7.10468 10.1518 6.9485 10.28 6.83861 10.4444Z"
@@ -328,8 +290,7 @@ const StyledNav = styled.div<{
         position: fixed;
         z-index: 10;
         left: 0;
-        transform: ${({ isBurger }) =>
-            isBurger ? 'translateX(0)' : 'translateX(-240px)'};
+        transform: ${({ isBurger }) => (isBurger ? 'translateX(0)' : 'translateX(-240px)')};
     }
 
     a.colored {
@@ -379,10 +340,8 @@ const StyledNav = styled.div<{
             background: ${({ theme }) => theme.navbarHover};
             border-radius: 8px;
             path {
-                stroke: ${({ theme, stroke }) =>
-                    stroke ? theme.navbarHoverFill : 'none'};
-                fill: ${({ theme, stroke }) =>
-                    stroke ? 'none' : theme.navbarHoverFill};
+                stroke: ${({ theme, stroke }) => (stroke ? theme.navbarHoverFill : 'none')};
+                fill: ${({ theme, stroke }) => (stroke ? 'none' : theme.navbarHoverFill)};
                 transition: 0.2s all ease;
             }
             p {
@@ -461,10 +420,8 @@ const StyledLink = styled.div<{ theme?: any; stroke?: any }>`
         background: ${({ theme }) => theme.navbarHover};
         border-radius: 8px;
         path {
-            stroke: ${({ theme, stroke }) =>
-                stroke ? theme.navbarHoverFill : 'none'};
-            fill: ${({ theme, stroke }) =>
-                stroke ? 'none' : theme.navbarHoverFill};
+            stroke: ${({ theme, stroke }) => (stroke ? theme.navbarHoverFill : 'none')};
+            fill: ${({ theme, stroke }) => (stroke ? 'none' : theme.navbarHoverFill)};
             transition: 0.2s all ease;
         }
         p {
