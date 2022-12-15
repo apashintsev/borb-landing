@@ -26,7 +26,6 @@ import { historySlice } from '../../store/reducers/historySlice'
 const Home = () => {
     const { asset } = useAppSelector((state) => state.gameSlice)
     const { setRef } = gameSlice.actions
-    const { refreshClosedBets } = historySlice.actions
     const dispatch = useAppDispatch()
     const [show, setShow] = React.useState<boolean>(false)
     const [popup, setPopup] = React.useState<boolean>(false)
@@ -89,12 +88,6 @@ const Home = () => {
     return (
         <StyledHome>
             <div className="container">
-                <button
-                    style={{ backgroundColor: 'red', marginBottom: '40px' }}
-                    onClick={() => dispatch(refreshClosedBets())}
-                >
-                    reload
-                </button>
                 {/*<button
                     style={{ backgroundColor: 'red', marginBottom:'40px' }}
                     onClick={handleClick}

@@ -4,6 +4,7 @@ import styled from 'styled-components'
 import { BetVm } from '../../../@types/Game/bet'
 import { allowedCurrencies } from '../../../lib/data'
 import SmallChart from '../../../components/SmallChart/SmallChart'
+import { BigNumber, ethers } from 'ethers'
 
 export interface IBetItemProps {
     bet: BetVm
@@ -13,45 +14,33 @@ export const BetItem: React.FunctionComponent<IBetItemProps> = ({ bet }) => {
     const betCurrency = allowedCurrencies.find((x) => x.ticker === bet.currency)
     const lastPrice = bet.points[bet.points.length]
     const directionUp = bet.betType === 0
-    const isWin =
-        (bet.betType == 0 && bet.lockPrice < lastPrice) ||
-        (bet.betType == 1 && bet.lockPrice > lastPrice)
+    const isWin = (bet.betType == 0 && bet.lockPrice < lastPrice) || (bet.betType == 1 && bet.lockPrice > lastPrice)
 
     const datetime = new Date(Date.parse(bet.lockedAt) + bet.timeframe * 1000)
 
-    const countdown = bet.closePrice==0;
-    console.log(bet.closePrice)
+    const countdown = bet.closePrice == 0
 
     return (
         <DataContentItem key={bet.betId}>
             <span className="center mobile-display-none">
                 <img src={betCurrency?.img} alt={betCurrency?.name} />
             </span>
-            <span className="">
+            <span>
                 <svg
-                    className={`first_td_adaptive ${
-                        !directionUp && 'rotate180deg'
-                    }`}
+                    className={`first_td_adaptive ${!directionUp && 'rotate180deg'}`}
                     width="32"
                     height="32"
                     viewBox="0 0 32 32"
                     fill="none"
                     xmlns="http://www.w3.org/2000/svg"
                 >
-                    <path
-                        d="M16 12L22 20H10L16 12Z"
-                        fill={`var(--${directionUp ? 'green' : 'pink'})`}
-                    />
+                    <path d="M16 12L22 20H10L16 12Z" fill={`var(--${directionUp ? 'green' : 'pink'})`} />
                 </svg>
             </span>
             <span className="center">${bet.lockPrice}</span>
 
             <span className="center">
-                {countdown ? (
-                    <Countdown date={new Date(datetime)} renderer={renderer} />
-                ) : (
-                    bet.closePrice
-                )}
+                {countdown ? <Countdown date={new Date(datetime)} renderer={renderer} /> : bet.closePrice}
             </span>
             <span className="chart_td center mobile-display-none">
                 <SmallChart data={bet.points} isWin={isWin} />
@@ -64,15 +53,15 @@ export const BetItem: React.FunctionComponent<IBetItemProps> = ({ bet }) => {
 }
 // @ts-ignore
 const renderer = ({ days, hours, minutes, seconds }) => {
-  var d = new Date();
-  var gmtHours = -d.getTimezoneOffset();
-  const totalHours = hours + days * 24; /* + gmtHours*/
-  return (
-    <span>
-      {totalHours}:{minutes}:{seconds}
-    </span>
-  );
-};
+    var d = new Date()
+    var gmtHours = -d.getTimezoneOffset()
+    const totalHours = hours + days * 24
+    return (
+        <span>
+            {totalHours}:{minutes}:{seconds}
+        </span>
+    )
+}
 
 const DataContentItem = styled.div`
     display: grid;

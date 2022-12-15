@@ -1,16 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { BigNumber, ethers } from 'ethers'
-import {
-    AssetTicker,
-    CurrencyTicker,
-    Timeframe,
-    TimeframeName,
-} from '../../@types/Game/game'
-import {
-    allowedAssets,
-    allowedCurrencies,
-    allowedTimeframes,
-} from '../../lib/data'
+import { BetVm } from '../../@types/Game/bet'
+import { AssetTicker, CurrencyTicker, TimeframeName } from '../../@types/Game/game'
+import { allowedAssets, allowedCurrencies, allowedTimeframes } from '../../lib/data'
 
 export const initialState = {
     ref: ethers.constants.AddressZero,
@@ -23,17 +15,15 @@ export const initialState = {
     timeframe: allowedTimeframes[0],
     currency: allowedCurrencies[0],
     currencyPrice: 25000 as number,
-    activeBetsCount: 0, //TODO
-    closedBetsCount: 0, //TODO
+    isPopupOpen: false,
+    closedBet: {} as BetVm,
 }
 export const gameSlice = createSlice({
     name: 'game',
     initialState,
     reducers: {
         setAsset(state, action: PayloadAction<AssetTicker>) {
-            state.asset =
-                allowedAssets.find((x) => x.name === action.payload) ??
-                allowedAssets[0]
+            state.asset = allowedAssets.find((x) => x.name === action.payload) ?? allowedAssets[0]
         },
         setAssetContract(state, action: PayloadAction<string>) {
             state.assetContractAddress = action.payload
@@ -45,14 +35,10 @@ export const gameSlice = createSlice({
             state.rewardPercent = action.payload
         },
         setTimeframe(state, action: PayloadAction<TimeframeName>) {
-            state.timeframe = allowedTimeframes.find(
-                (x) => x.name === action.payload
-            )!
+            state.timeframe = allowedTimeframes.find((x) => x.name === action.payload)!
         },
         setCurrency(state, action: PayloadAction<CurrencyTicker>) {
-            state.currency =
-                allowedCurrencies.find((x) => x.ticker === action.payload) ??
-                allowedCurrencies[0]
+            state.currency = allowedCurrencies.find((x) => x.ticker === action.payload) ?? allowedCurrencies[0]
         },
         setCurrencyPrice(state, action: PayloadAction<number>) {
             state.currencyPrice = action.payload
@@ -60,11 +46,11 @@ export const gameSlice = createSlice({
         setRef(state, action: PayloadAction<string>) {
             state.ref = action.payload
         },
-        setActiveBetsCount(state, action: PayloadAction<number>) {
-            state.activeBetsCount = action.payload
+        setIsPopupOpen(state, action: PayloadAction<boolean>) {
+            state.isPopupOpen = action.payload
         },
-        setClosedBetsCount(state, action: PayloadAction<number>) {
-            state.closedBetsCount = action.payload
+        setClosedBet(state, action: PayloadAction<BetVm>) {
+            state.closedBet = action.payload
         },
     },
 })

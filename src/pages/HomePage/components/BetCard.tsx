@@ -40,7 +40,7 @@ export function BetCard() {
                     const userBalance = await getBalance(assetAddress!, address!, web3Provider!)
                     dispatch(setUserBalance(userBalance))
                     const rewardPercent = await gameContract.rewardPercent(currency.id, asset.id, timeframe.value)
-                    console.log({ rewardPercent })
+                   // console.log({ rewardPercent })
                     dispatch(setRewardPercent(rewardPercent.toNumber()))
                 }
             } catch (e: any) {

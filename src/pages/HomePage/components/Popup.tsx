@@ -1,94 +1,66 @@
 import * as React from 'react'
-import { BorbGame__factory } from '../../../@types/contracts/BorbGame__factory'
-import { useWeb3Context } from '../../../context/Web3Context'
-import { useAppSelector } from '../../../hooks/redux'
+import { gameSlice } from '../../../store/reducers/gameSlice'
+import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 import { useUserNotifications } from '../../../hooks/useUserNotifications'
 import { useOnClickOutside } from '../../../lib/useOnClickOutside'
-import {
-    Column,
-    Head,
-    Popup,
-    PopupBottom,
-    PopupButton,
-    PopupContent,
-    PopupTitle,
-} from './main'
+import { Column, Head, Popup, PopupBottom, PopupContent, PopupTitle } from './main'
+import { allowedCurrencies, allowedTimeframes } from '../../../lib/data'
+import SmallChart from '../../../components/SmallChart/SmallChart'
 
 export function PopupWindow() {
     useUserNotifications()
-    const { web3Provider, address } = useWeb3Context()
-    const { asset, gameContractAddress } = useAppSelector(
-        (state) => state.gameSlice
-    )
+    const { isPopupOpen, closedBet } = useAppSelector((state) => state.gameSlice)
+    const { setIsPopupOpen } = gameSlice.actions
 
-    const [show, setShow] = React.useState<boolean>(false)
+    const dispatch = useAppDispatch()
     let ref = React.useRef(null)
-    useOnClickOutside(ref, () => setShow(false))
+    useOnClickOutside(ref, () => dispatch(setIsPopupOpen(false)))
 
-    React.useEffect(() => {
-        // Using an IIFE
-        ;(async function anyNameFunction() {
-            if (!web3Provider) return
-
-            const gameContract = BorbGame__factory.connect(
-                gameContractAddress,
-                web3Provider!
-            )
-            const startBlockNumber = await web3Provider!.getBlockNumber()
-            gameContract.on('BetClaimed', (...args) => {
-                const event = args[args.length - 1]
-                if (event.blockNumber <= startBlockNumber) {
-                    if (args[0] == address) {
-                        setShow(true)
-                    }
-                    //args[0], args[1]
-                }
-            })
-        })()
-    }, [asset, address])
+    const betCurrency = allowedCurrencies.find((x) => x.ticker === closedBet.currency)
+    const directionUp = closedBet.betType === 0
+    const timeframe = allowedTimeframes.find((x) => x.value == closedBet.timeframe)?.name
+    const isWin =
+        (closedBet.betType == 0 && closedBet.lockPrice < closedBet.closePrice) ||
+        (closedBet.betType == 1 && closedBet.lockPrice > closedBet.closePrice)
 
     return (
-        <Popup show={show}>
+        <Popup show={isPopupOpen}>
             <PopupContent ref={ref}>
                 <Head>
                     <PopupTitle>Trade result</PopupTitle>
-                    <img
-                        src="/images/home/close.svg"
-                        alt="Close"
-                        onClick={() => setShow(false)}
-                    />
+                    <img src="/images/home/close.svg" alt="Close" onClick={() => dispatch(setIsPopupOpen(false))} />
                 </Head>
+                <div style={{ height: '100px' }}>
+                    <SmallChart data={closedBet.points} isWin={isWin} />
+                </div>
                 <PopupBottom>
                     <Column>
                         <p>Asset</p>
-                        <img src="/images/home/bitcoin.svg" alt="" />
+                        <img src={betCurrency?.img} alt={betCurrency?.name} />
                     </Column>
                     <Column>
                         <p>Direction</p>
                         <svg
-                            style={{
-                                position: 'relative',
-                                bottom: '-6px',
-                            }}
+                            className={`first_td_adaptive ${!directionUp && 'rotate180deg'}`}
                             width="32"
                             height="32"
                             viewBox="0 0 32 32"
                             fill="none"
                             xmlns="http://www.w3.org/2000/svg"
                         >
-                            <path
-                                d="M16 12L22 20H10L16 12Z"
-                                fill="var(--green)"
-                            />
+                            <path d="M16 12L22 20H10L16 12Z" fill={`var(--${directionUp ? 'green' : 'pink'})`} />
                         </svg>
                     </Column>
                     <Column>
                         <p>Timeframe</p>
-                        <span>15 min</span>
+                        <span>{timeframe}</span>
                     </Column>
                     <Column>
                         <p>Result</p>
-                        <span>+100 Usd</span>
+                        <span className={`price-${isWin ? 'increase' : 'drop'} last`}>
+                            {isWin ? `+${closedBet.potentialReward} ` : `-${closedBet.amount} `}
+                            USD
+                        </span>
                     </Column>
                 </PopupBottom>
             </PopupContent>

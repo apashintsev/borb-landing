@@ -50,7 +50,7 @@ export const useWeb3 = () => {
         });
 
         const provider = await web3Modal.connect();
-        console.log({provider})
+
         const web3Provider = new ethers.providers.Web3Provider(provider);
         const signer = web3Provider.getSigner();
         const address = await signer.getAddress();

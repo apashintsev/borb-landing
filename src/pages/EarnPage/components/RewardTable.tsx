@@ -7,6 +7,7 @@ import { getRewards } from '../../../store/api/referal'
 import { referalRewardsSlice } from '../../../store/reducers/referalRewardsSlice'
 import { AdaptiveTable, Item, TableGrid, TableHead, TableRow } from './styles'
 import { Spinner } from '../../../components/Spinner/Spinner'
+import { toast } from 'react-toastify'
 
 export function RewardTable() {
     const { address } = useWeb3Context()
@@ -69,7 +70,7 @@ export function RewardTable() {
                 </div>}
             </AdaptiveTable>
             {isLoading && <Spinner />}
-            {errors?.length > 0 && toast.error(getErrors().join(','))}
+            {errors?.length > 0 && toast.error(errors.join(','))}
             <Pagination hasNext={hasNext} hasPrev={hasPrevious} setPage={setPage} />
         </>
     )
