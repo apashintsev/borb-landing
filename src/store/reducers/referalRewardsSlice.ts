@@ -10,12 +10,16 @@ export const initialState = {
     hasPrevious: false,
     isLoading: false,
     errors: [] as string[],
+    currentPage: 0,
 }
 
 export const referalRewardsSlice = createSlice({
     name: 'referalRewards',
     initialState,
     reducers: {
+        setCurrentPage(state, action: PayloadAction<number>) {
+            state.currentPage = action.payload
+        },
     },
     extraReducers: {
         [getRewards.pending.type]: (state) => {

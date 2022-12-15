@@ -10,6 +10,7 @@ import { BigNumber, ethers } from 'ethers'
 import { getParsedEthersError } from '@enzoferey/ethers-error-parser'
 import { SelectAsset } from './SelectAsset'
 import { getBalance, increaseAllowance, isAllowed } from '../../../store/api/contracts'
+import { useTranslation } from 'react-i18next'
 
 const BetTypeUP = 0
 const BetTypeDown = 1
@@ -18,10 +19,19 @@ export type BetType = 0 | 1
 const ERROR_CODE_TX_REJECTED_BY_USER = 4001
 
 export function BetCard() {
+    const { t } = useTranslation()
     const { web3Provider, address } = useWeb3Context()
-    const { ref, asset, rewardPercent, gameContractAddress, assetContractAddress, poolContractAddress, userBalance, timeframe, currency } = useAppSelector(
-        (state) => state.gameSlice
-    )
+    const {
+        ref,
+        asset,
+        rewardPercent,
+        gameContractAddress,
+        assetContractAddress,
+        poolContractAddress,
+        userBalance,
+        timeframe,
+        currency,
+    } = useAppSelector((state) => state.gameSlice)
     const { setAssetContract, setUserBalance, setRewardPercent } = gameSlice.actions
     const dispatch = useAppDispatch()
     const [amount, setAmount] = useState<number>(0)
@@ -40,7 +50,6 @@ export function BetCard() {
                     const userBalance = await getBalance(assetAddress!, address!, web3Provider!)
                     dispatch(setUserBalance(userBalance))
                     const rewardPercent = await gameContract.rewardPercent(currency.id, asset.id, timeframe.value)
-                   // console.log({ rewardPercent })
                     dispatch(setRewardPercent(rewardPercent.toNumber()))
                 }
             } catch (e: any) {
@@ -61,7 +70,9 @@ export function BetCard() {
         try {
             let newBetValue = ethers.utils.parseUnits(value.toString(), 6)
             if (value > Number.parseFloat(ethers.utils.formatUnits(userBalance, 6))) {
-                newBetValue = userBalance.gt(process.env.REACT_APP_MAX_BET!) ? BigNumber.from(process.env.REACT_APP_MAX_BET!) : userBalance
+                newBetValue = userBalance.gt(process.env.REACT_APP_MAX_BET!)
+                    ? BigNumber.from(process.env.REACT_APP_MAX_BET!)
+                    : userBalance
             }
             setAmount(Math.abs(Number.parseFloat(ethers.utils.formatUnits(newBetValue, 6))))
         } catch {
@@ -71,7 +82,7 @@ export function BetCard() {
 
     async function makeBetHandler(betType: BetType) {
         if (!address) {
-            toast.info('Please connect wallet')
+            toast.info(t('HomePage.Connect wallet'))
         }
         const gameContract = BorbGame__factory.connect(gameContractAddress, web3Provider!)
         try {
@@ -88,9 +99,9 @@ export function BetCard() {
                 )
                 toast
                     .promise(result.wait(), {
-                        pending: 'Adding bet',
-                        success: 'Bet added 👌',
-                        error: 'Error 🤯',
+                        pending: t<string>('HomePage.Adding bet'),
+                        success: t<string>('HomePage.Bet added 👌'),
+                        error: t<string>('HomePage.Error 🤯'),
                     })
                     .then((_) => setReload((prev) => prev + 1))
             } else {
@@ -131,15 +142,19 @@ export function BetCard() {
                         <input
                             type="number"
                             className="input"
-                            placeholder="Amount"
+                            placeholder={t<string>('HomePage.Amount')}
                             value={amount}
                             onChange={(e) => setBetValueHandler(Number.parseFloat(e.target.value))}
                         />
                     </div>
                 </InputWrapper>
                 <HelperRow>
-                    <Text>Balance: {ethers.utils.formatUnits(userBalance, 6)}</Text>
-                    <Text>${amount + (amount / 100) * rewardPercent} payout</Text>
+                    <Text>
+                        {t('HomePage.Balance')}: {ethers.utils.formatUnits(userBalance, 6)}
+                    </Text>
+                    <Text>
+                        ${amount + (amount / 100) * rewardPercent} {t('HomePage.payout')}
+                    </Text>
                 </HelperRow>
                 <Grid>
                     <Card onClick={() => setBetHandler(10)}>10%</Card>

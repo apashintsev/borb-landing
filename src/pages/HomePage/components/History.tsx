@@ -8,10 +8,12 @@ import { getActiveBets, getClosedBets } from '../../../store/api/bets'
 import Pagination from '../../../components/Pagination/Pagination'
 import { Spinner } from '../../../components/Spinner/Spinner'
 import { toast } from 'react-toastify'
+import { useTranslation } from 'react-i18next'
 
 type ActiveTab = 'Active' | 'Closed'
 
 export function History() {
+    const { t } = useTranslation()
     const { address } = useWeb3Context()
     const { asset, timeframe } = useAppSelector((state) => state.gameSlice)
     const { activeBets, closedBets } = useAppSelector((state) => state.historySlice)
@@ -73,29 +75,29 @@ export function History() {
 
     return (
         <>
-            <Title>Trade</Title>
+            <Title>{t('HomePage.History.Title')}</Title>
             <div className="tab_container">
                 <TabContainer>
                     <Tab active={activeTabName === 'Active'} onClick={() => setActiveTab('Active')}>
                         <span>
-                            Active <h3>{activeBets.count}</h3>
+                            {t('HomePage.History.Active')} <h3>{activeBets.count}</h3>
                         </span>
                     </Tab>
                     <Tab active={activeTabName === 'Closed'} onClick={() => setActiveTab('Closed')}>
                         <span>
-                            Closed <h3>{closedBets.count}</h3>
+                            {t('HomePage.History.Closed')} <h3>{closedBets.count}</h3>
                         </span>
                     </Tab>
                 </TabContainer>
             </div>
             <DataTable>
                 <DataHeader>
-                    <span className="center mobile-display-none">Asset</span>
-                    <span className="mobile-no-color">Direction</span>
-                    <span className="">Open</span>
-                    <span>Close</span>
-                    <span className="mobile-display-none">Chart</span>
-                    <span className="last">Result</span>
+                    <span className="center mobile-display-none">{t('HomePage.History.Asset')}</span>
+                    <span className="mobile-no-color">{t('HomePage.History.Direction')}</span>
+                    <span className="">{t('HomePage.History.Open')}</span>
+                    <span>{t('HomePage.History.Close')}</span>
+                    <span className="mobile-display-none">{t('HomePage.History.Chart')}</span>
+                    <span className="last">{t('HomePage.History.Result')}</span>
                 </DataHeader>
 
                 {!geIsLoading() && (
@@ -106,7 +108,7 @@ export function History() {
                     </DataContent>
                 )}
                 {geIsLoading() && <Spinner />}
-                {getErrors()?.length>0 && toast.error(getErrors().join(','))}
+                {getErrors()?.length > 0 && toast.error(getErrors().join(','))}
             </DataTable>
             <Pagination hasNext={getHasNext()} hasPrev={getHasPrev()} setPage={setCurrentPage} />
         </>

@@ -1,0 +1,109 @@
+{
+    "texts": {
+        "FAQ": {
+            "Question 1": {
+                "Question": "What are event contracts?",
+                "Answer": "Answer Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt"
+            },
+            "Question 2": {
+                "Question": "What are event contracts?",
+                "Answer": "Answer Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt"
+            },
+            "Question 3": {
+                "Question": "What are event contracts?",
+                "Answer": "Answer Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt"
+            },
+            "Question 4": {
+                "Question": "What are event contracts?",
+                "Answer": "Answer Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt"
+            },
+            "Question 5": {
+                "Question": "What are event contracts?",
+                "Answer": "Answer Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt"
+            },
+            "Question 6": {
+                "Question": "What are event contracts?",
+                "Answer": "Answer Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt"
+            },
+            "Question 7": {
+                "Question": "What are event contracts?",
+                "Answer": "Answer Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt"
+            },
+            "Question 8": {
+                "Question": "What are event contracts?",
+                "Answer": "Answer Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt"
+            }
+        },
+        "Footer": { "Privacy Policy": "Privacy Policy" },
+        "Navigation":{
+            "MANAGEMENTS":"MANAGEMENTS",
+            "Trade":"Trade",
+            "Earn":"Earn",
+            "Supply":"Supply",
+            "Support":"Support",
+            "Messages":"Messages",
+            "Settings":"Settings",
+            "About":"About",
+            "Docs":"Docs",
+            "Price feed":"Price feed"
+        },
+        "EarnPage":{
+            "Title":"Earn crypto by referring friends",
+            "Subitle":"Share your referal link, invite friend and you'll be rewarded with 50% of their trading fees",
+            "Referal":"Referal",
+            "Reward":"Reward",
+            "Wallet address":"Wallet address",
+            "Asset":"Asset",
+            "Reward earned":"Reward earned",
+            "ClaimSection":{
+                "Claim":"Claim",
+                "Nothing to claim":"Nothing to claim",
+                "Claiming reward":"Claiming reward",
+                "Reward claimed 👌":"Reward claimed 👌"
+            }
+        },
+        "HomePage":{
+            "Balance":"Balance",
+            "Amount":"Amount",
+            "payout":"payout",
+            "Connect wallet":"Please connect wallet",
+            "Adding bet":"Adding bet",
+            "History":{
+                "Title":"Trade",
+                "Active":"Active",
+                "Closed":"Closed",
+                "Asset":"Asset",
+                "Direction":"Direction",
+                "Open":"Open",
+                "Close":"Close",
+                "Chart":"Chart",
+                "Result":"Result"
+            },
+            "Popup":{
+                "Title":"Trade result",
+                "Asset":"Asset",
+                "Direction":"Direction",
+                "Timeframe":"Timeframe",
+                "Result":"Result"
+            }
+        },
+        "SupplyPage":{
+            "Title":"Supply crypto and earn interest",
+            "Subtitle":"Supply your tokens and get Token+ while earning interest",
+            "Supply":"Supply",
+            "Withdraw":"Withdraw",
+            "Balance":"Balance",
+            "Exchange rate":"Exchange rate",
+            "Deposit fee":"Deposit fee",
+            "Projected APY":"Projected APY",
+            "Connect wallet":"Connect wallet",
+            "Depositing":"Depositing",
+            "Deposit added 👌":"Deposit added 👌",
+            "Error 🤯":"Error 🤯",
+            "Withdrawing":"Withdrawing",
+            "Withdrawed 👌":"Withdrawed 👌",
+            "Error withdraw 🤯":"Error 🤯"
+
+        }
+    }
+}

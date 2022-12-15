@@ -1,38 +1,20 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import styled from 'styled-components'
-import {
-    Column,
-    Head,
-    Popup,
-    PopupBottom,
-    PopupButton,
-    PopupContent,
-    PopupTitle,
-    Row,
-    StyledHome,
-} from './components/main'
-import { useOnClickOutside } from '../../lib/useOnClickOutside'
+import { Row, StyledHome } from './components/main'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
 import { gameSlice } from '../../store/reducers/gameSlice'
-import SelectCurrency from './components/SelectCurrency'
+import SelectCurrency from '../../components/SelectCurrency/SelectCurrency'
 import { BetCard } from './components/BetCard'
 import { Chart } from './components/Chart'
 import { History } from './components/History'
 import { getQueryVariable } from '../../lib/sharedFunctions'
 import { regexEthAddress } from '../../lib/data'
 import { PopupWindow } from './components/Popup'
-import { historySlice } from '../../store/reducers/historySlice'
 
 const Home = () => {
     const { asset } = useAppSelector((state) => state.gameSlice)
     const { setRef } = gameSlice.actions
     const dispatch = useAppDispatch()
-    const [show, setShow] = React.useState<boolean>(false)
-    const [popup, setPopup] = React.useState<boolean>(false)
-    let ref = React.useRef(null)
-    let ref2 = React.useRef(null)
-    useOnClickOutside(ref, () => setShow(false))
-    useOnClickOutside(ref2, () => setPopup(false))
 
     useEffect(() => {
         const refFromUrl = getQueryVariable('ref').toString()
@@ -41,66 +23,10 @@ const Home = () => {
             dispatch(setRef(result[0]))
         }
     }, [asset])
-    const handleClick = async () => {
-        //setIsLoading(true)
-        try {
-            const response = await fetch(process.env.REACT_APP_BACKEND_URI! + '/api/Settings/ToggleAggregatorIsOn', {
-                method: 'POST',
-            })
 
-            if (!response.ok) {
-                throw new Error(`Error! status: ${response.status}`)
-            }
-
-            const result = await response.json()
-
-            // console.log('result is: ', JSON.stringify(result, null, 4))
-
-            //setData(result)
-        } catch (err) {
-            //setErr(err.message)
-        } finally {
-            // setIsLoading(false)
-        }
-    }
-    const handleClick2 = async () => {
-        //setIsLoading(true)
-        try {
-            const response = await fetch(process.env.REACT_APP_BACKEND_URI! + '/api/Settings/GetAggregatorIsOn', {
-                method: 'Get',
-            })
-
-            if (!response.ok) {
-                throw new Error(`Error! status: ${response.status}`)
-            }
-
-            const result = await response.json()
-            alert(result)
-            // console.log('result is: ', JSON.stringify(result, null, 4))
-
-            //setData(result)
-        } catch (err) {
-            //setErr(err.message)
-        } finally {
-            // setIsLoading(false)
-        }
-    }
     return (
         <StyledHome>
             <div className="container">
-                {/*<button
-                    style={{ backgroundColor: 'red', marginBottom:'40px' }}
-                    onClick={handleClick}
-                >
-                    Включить/выключить
-                </button>
-                
-                <button
-                    style={{ backgroundColor: 'red' }}
-                    onClick={handleClick2}
-                >
-                    Включено?
-    </button>*/}
                 <SelectCurrency />
                 <Row>
                     <Chart />

@@ -1,7 +1,8 @@
-import React from 'react'
+import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 
 const Footer = () => {
+    const { t } = useTranslation()
     return (
         <StyledFooter>
             <div className="icons">
@@ -9,7 +10,7 @@ const Footer = () => {
                 <img src="/images/primary/github.svg" alt="" />
                 <img src="/images/primary/redit.svg" alt="" />
             </div>
-            <p>© {new Date().getFullYear()} BorB | Privacy Policy</p>
+            <p>© {new Date().getFullYear()} BorB | {t('Footer.Privacy Policy')}</p>
         </StyledFooter>
     )
 }

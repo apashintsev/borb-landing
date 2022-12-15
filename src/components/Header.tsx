@@ -4,72 +4,17 @@ import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { useWeb3Context } from '../context/Web3Context'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
-import { useOnClickOutside } from '../lib/useOnClickOutside'
-import { SelectBodyHead } from '../pages/HomePage'
 import { appSettings } from '../store/reducers/appSettingsSlice'
 import { Web3Button } from './ConnectWallet/Web3Button'
-let data = [
-    {
-        name: 'Bitcoin',
-        ticker: 'btc',
-        img: '/images/home/bitcoin.svg',
-    },
-    {
-        name: 'Ethereum',
-        ticker: 'eth',
-        img: 'https://cryptologos.cc/logos/ethereum-eth-logo.svg?v=023',
-    },
-    {
-        name: 'Solana',
-        ticker: 'sol',
-        img: 'https://bitbill.oss-accelerate.aliyuncs.com/pics/coins/solana-plain.svg',
-    },
-    {
-        name: 'BNB',
-        ticker: 'bnb',
-        img: 'https://cryptologos.cc/logos/bnb-bnb-logo.svg?v=023',
-    },
-    {
-        name: 'Cardano',
-        ticker: 'ada',
-        img: 'https://cryptologos.cc/logos/cardano-ada-logo.svg?v=023',
-    },
-    {
-        name: 'Polkadot',
-        ticker: 'dot',
-        img: 'https://cryptologos.cc/logos/polkadot-new-dot-logo.svg?v=023',
-    },
-    {
-        name: 'Polygon',
-        ticker: 'matic',
-        img: 'https://cryptologos.cc/logos/polygon-matic-logo.svg?v=023',
-    },
-    {
-        name: 'Dogecoin',
-        ticker: 'doge',
-        img: 'https://cryptologos.cc/logos/dogecoin-doge-logo.svg?v=023',
-    },
-    {
-        name: 'Cosmos',
-        ticker: 'atom',
-        img: 'https://cryptologos.cc/logos/cosmos-atom-logo.svg?v=023',
-    },
-    {
-        name: 'Avalanche',
-        ticker: 'avax',
-        img: 'https://cryptologos.cc/logos/avalanche-avax-logo.svg?v=023',
-    },
-]
+import SelectCurrency from './SelectCurrency/SelectCurrency'
+
 const Header = () => {
     const { address } = useWeb3Context()
     const { themeName } = useAppSelector((state) => state.appSettings)
     const { changeTheme, setIsBurger, setIsLangaugePopup } = appSettings.actions
     const dispatch = useAppDispatch()
     const [trueLocation, setTrueLocation] = React.useState(false)
-    const [itemId2, setItemId2] = React.useState(0)
-    const [secondPopup, setSecondPopup] = React.useState(false)
-    let ref = React.useRef(null)
-    useOnClickOutside(ref, () => setSecondPopup(false))
+
     let location = useLocation()
 
     React.useEffect(() => {
@@ -83,33 +28,8 @@ const Header = () => {
     return (
         <StyledHeader location={trueLocation}>
             {trueLocation && (
-                <div className="btc_wrapper">
-                    <div className="btc" onClick={() => setSecondPopup(true)}>
-                        <img src={data[itemId2].img} alt={data[itemId2].name} className="currency" />
-                        <h4>{data[itemId2].ticker}</h4>
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 15L7.5 9L16.5 9L12 15Z" fill="#23272B" />
-                        </svg>
-                    </div>{' '}
-                    {secondPopup && (
-                        <SelectBodyHead ref={ref}>
-                            {data.map((item, index) => (
-                                <div
-                                    className="select_card"
-                                    onClick={() => {
-                                        setItemId2(index)
-                                        setSecondPopup(false)
-                                    }}
-                                >
-                                    <img src={item.img} alt={item.name} />
-                                    <p>{item.name}</p>
-                                </div>
-                            ))}
-                        </SelectBodyHead>
-                    )}
-                </div>
+                <SelectCurrency/>
             )}
-
             <div className="left">
                 <svg
                     width="20"
@@ -126,7 +46,7 @@ const Header = () => {
                 </svg>
                 <NavLink to="/">
                     <div className="logo">
-                        <img src="/images/primary/Logo.png" alt="" />
+                        <img src="/images/primary/Logo.png" alt="BorB" />
                         <p>BorB</p>
                     </div>
                 </NavLink>

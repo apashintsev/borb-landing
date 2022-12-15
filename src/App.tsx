@@ -16,8 +16,10 @@ import { Web3ContextProvider } from './context/Web3Context'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
+import './i18n/config'
+
 const App = () => {
-    const { themeName, themeSettings, isBurger, isLangaugePopup } = useAppSelector((state) => state.appSettings)
+    const { themeName, themeSettings, isBurger } = useAppSelector((state) => state.appSettings)
 
     const appRef = useRef<HTMLDivElement | null>(null)
 
@@ -43,7 +45,7 @@ const App = () => {
                     <Nav />
                     <MainContainer>
                         <Header />
-                        {isLangaugePopup && <LangaugePopup />}
+                        <LangaugePopup />
                         <Routes>
                             <Route path="/" element={<HomePage />} />
                             <Route path="/supply" element={<SupplyPage />} />

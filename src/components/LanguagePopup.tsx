@@ -1,5 +1,8 @@
+import { useRef } from 'react'
+import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
-import { useAppDispatch } from '../hooks/redux'
+import { useAppDispatch, useAppSelector } from '../hooks/redux'
+import { useOnClickOutside } from '../lib/useOnClickOutside'
 import { appSettings } from '../store/reducers/appSettingsSlice'
 
 const data = [
@@ -61,59 +64,72 @@ const data = [
 ]
 
 const LangaugePopup = () => {
+    const { isLangaugePopup } = useAppSelector((state) => state.appSettings)
     const { setIsLangaugePopup } = appSettings.actions
     const dispatch = useAppDispatch()
+    let ref = useRef(null)
+    useOnClickOutside(ref, () => dispatch(setIsLangaugePopup(false)))
+
+    const { t, i18n } = useTranslation()
+
+    const changeLanguage = (lng: string) => {
+        i18n.changeLanguage(lng)
+    }
 
     return (
-        <StyledPopup>
-            <div className="head">
-                <h4 className="title">Change language</h4>
-                <svg
-                    version="1.1"
-                    id="Layer_1"
-                    xmlns="http://www.w3.org/2000/svg"
-                    x="0px"
-                    y="0px"
-                    viewBox="0 0 512 512"
-                    onClick={() => dispatch(setIsLangaugePopup(false))}
-                >
-                    <g>
-                        <g>
-                            <polygon
-                                points="512,59.076 452.922,0 256,196.922 59.076,0 0,59.076 196.922,256 0,452.922 59.076,512 256,315.076 452.922,512 
+        <>
+            {isLangaugePopup && (
+                <StyledPopup ref={ref}>
+                    <div className="head">
+                        <h4 className="title">Change language</h4>
+                        <svg
+                            version="1.1"
+                            id="Layer_1"
+                            xmlns="http://www.w3.org/2000/svg"
+                            x="0px"
+                            y="0px"
+                            viewBox="0 0 512 512"
+                            onClick={() => dispatch(setIsLangaugePopup(false))}
+                        >
+                            <g>
+                                <g>
+                                    <polygon
+                                        points="512,59.076 452.922,0 256,196.922 59.076,0 0,59.076 196.922,256 0,452.922 59.076,512 256,315.076 452.922,512 
 			512,452.922 315.076,256 		"
-                            />
-                        </g>
-                    </g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                    <g></g>
-                </svg>
-            </div>
-
-            <div className="grid">
-                {data.map((card) => (
-                    <div key={card.short} className="card" onClick={() => dispatch(setIsLangaugePopup(false))}>
-                        <img className="card_img" src={card.url} alt="" />
-                        <p>
-                            {card.name} &nbsp;-&nbsp; {card.short}
-                        </p>
+                                    />
+                                </g>
+                            </g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                            <g></g>
+                        </svg>
                     </div>
-                ))}
-            </div>
-        </StyledPopup>
+
+                    <div className="grid">
+                        {data.map((card) => (
+                            <div key={card.short} className="card" onClick={() => dispatch(setIsLangaugePopup(false))}>
+                                <img className="card_img" src={card.url} alt={card.name} />
+                                <p onClick={() => changeLanguage(card.short.toLowerCase())}>
+                                    {card.name} &nbsp;-&nbsp; {card.short}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </StyledPopup>
+            )}
+        </>
     )
 }
 

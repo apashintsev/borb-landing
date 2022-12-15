@@ -1,18 +1,12 @@
-import { produceWithPatches } from 'immer'
-import React, { FunctionComponent, ReactNode } from 'react'
+import { FunctionComponent, ReactNode } from 'react'
 import { useWeb3Context } from '../../context/Web3Context'
-//import { Web3Address } from "../Web3Address/Web3Address";
 
 interface ConnectProps {
     children: ReactNode
     connect: (() => Promise<void>) | null
 }
 const ConnectButton: FunctionComponent<ConnectProps> = (props) => {
-    return props.connect ? (
-        <button onClick={props.connect}>{props.children}</button>
-    ) : (
-        <button>Loading...</button>
-    )
+    return props.connect ? <button onClick={props.connect}>{props.children}</button> : <button>Loading...</button>
 }
 
 interface DisconnectProps {
@@ -21,11 +15,7 @@ interface DisconnectProps {
 }
 
 const DisconnectButton: FunctionComponent<DisconnectProps> = (props) => {
-    return props.disconnect ? (
-        <button onClick={props.disconnect}>{props.children}</button>
-    ) : (
-        <button>Loading...</button>
-    )
+    return props.disconnect ? <button onClick={props.disconnect}>{props.children}</button> : <button>Loading...</button>
 }
 
 interface Web3ButtonProps {

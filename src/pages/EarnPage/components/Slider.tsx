@@ -1,6 +1,7 @@
 import { ethers } from 'ethers'
 import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { toast } from 'react-toastify'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Pool__factory } from '../../../@types/contracts/Pool__factory'
@@ -12,6 +13,7 @@ import { ReferalBlock } from './ReferalBlock'
 import { Card, CardContentText, CardSubLink, Row, RowText } from './styles'
 
 export function Slider() {
+    const { t } = useTranslation()
     const swiperRef = useRef<HTMLElement | null>(null)
     const { address, web3Provider } = useWeb3Context()
     const { poolContractAddress } = useAppSelector((state) => state.gameSlice)
@@ -48,7 +50,7 @@ export function Slider() {
 
     async function claim(assetId: number) {
         if (balances[assetId] == 0) {
-            toast.info('Nothing to claim')
+            toast.info(t('EarnPage.Nothing to claim'))
             return
         }
         const poolContract = Pool__factory.connect(poolContractAddress, web3Provider!)
@@ -59,9 +61,9 @@ export function Slider() {
             )
             toast
                 .promise(result.wait(), {
-                    pending: 'Claiming reward',
-                    success: 'Reward claimed 👌',
-                    error: 'Error 🤯',
+                    pending: t<string>('EarnPage.ClaimSection.Claiming reward'),
+                    success: t<string>('EarnPage.ClaimSection.Reward claimed 👌'),
+                    error: t<string>('EarnPage.ClaimSection.Error 🤯'),
                 })
                 .then((_) => setReload((prev) => prev + 1))
         } catch (e: any) {
@@ -94,7 +96,7 @@ export function Slider() {
                             </Row>
                             <CardContentText>{`$ ${balances[asset.id] ?? 0}`}</CardContentText>
                             <CardSubLink>
-                                <p onClick={() => claim(asset.id)}>Claim</p>
+                                <p onClick={() => claim(asset.id)}>{t('EarnPage.ClaimSection.Claim')}</p>
                                 <img src="/images/earn/arrow.svg" alt="Claim" />
                             </CardSubLink>
                         </Card>

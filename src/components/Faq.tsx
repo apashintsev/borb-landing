@@ -1,68 +1,57 @@
 import { useState } from 'react'
 import styled from 'styled-components'
-
-const DATA = [
-    {
-        title: 'What are event contracts?',
-        subtitle:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.',
-    },
-    {
-        title: 'How does trading work?',
-        subtitle:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.',
-    },
-    {
-        title: 'How is the market price determined?',
-        subtitle:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.',
-    },
-    {
-        title: 'Who am I trading with?',
-        subtitle:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.',
-    },
-    {
-        title: 'How is BorB regulated?',
-        subtitle:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.',
-    },
-    {
-        title: 'How are customer deposits processed?',
-        subtitle:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.',
-    },
-    {
-        title: 'Is this gambling?',
-        subtitle:
-            'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.',
-    },
-]
+import { useTranslation } from 'react-i18next'
 
 const Faq = () => {
+    const { t } = useTranslation()
+    const DATA = [
+        {
+            title: t('FAQ.Question 1.Question'),
+            subtitle: t('FAQ.Question 1.Answer'),
+        },
+        {
+            title: t('FAQ.Question 2.Question'),
+            subtitle: t('FAQ.Question 2.Answer'),
+        },
+        {
+            title: t('FAQ.Question 3.Question'),
+            subtitle: t('FAQ.Question 3.Answer'),
+        },
+        {
+            title: t('FAQ.Question 4.Question'),
+            subtitle: t('FAQ.Question 4.Answer'),
+        },
+        {
+            title: t('FAQ.Question 5.Question'),
+            subtitle: t('FAQ.Question 5.Answer'),
+        },
+        {
+            title: t('FAQ.Question 6.Question'),
+            subtitle: t('FAQ.Question 6.Answer'),
+        },
+        {
+            title: t('FAQ.Question 7.Question'),
+            subtitle: t('FAQ.Question 7.Answer'),
+        },
+        {
+            title: t('FAQ.Question 8.Question'),
+            subtitle: t('FAQ.Question 8.Answer'),
+        },
+    ]
+
     return (
         <FaqWrapper>
             <FaqTitle>FAQ</FaqTitle>
             <FaqList>
                 {DATA.map(({ title, subtitle }, id) => (
-                    <FaqItemWrapper
-                        key={id}
-                        title={title}
-                        subtitle={subtitle}
-                    />
+                    <FaqItemWrapper key={id} title={title} subtitle={subtitle} />
                 ))}
             </FaqList>
         </FaqWrapper>
     )
 }
 
-const FaqItemWrapper = ({
-    title,
-    subtitle,
-}: {
-    title: string
-    subtitle: string
-}) => {
+const FaqItemWrapper = ({ title, subtitle }: { title: string; subtitle: string }) => {
     const [open, setOpen] = useState(false)
 
     return (
@@ -144,8 +133,7 @@ const PlusIcon = styled.span<{ open: boolean }>`
         content: '';
         top: -0.5px;
 
-        background-color: ${({ open, theme }) =>
-            !open ? `${theme.faqCrossColor}` : 'transparent'};
+        background-color: ${({ open, theme }) => (!open ? `${theme.faqCrossColor}` : 'transparent')};
 
         transform: rotate(-90deg) translateX(-50%);
     }

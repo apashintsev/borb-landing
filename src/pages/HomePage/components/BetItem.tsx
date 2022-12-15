@@ -4,7 +4,6 @@ import styled from 'styled-components'
 import { BetVm } from '../../../@types/Game/bet'
 import { allowedCurrencies } from '../../../lib/data'
 import SmallChart from '../../../components/SmallChart/SmallChart'
-import { BigNumber, ethers } from 'ethers'
 
 export interface IBetItemProps {
     bet: BetVm

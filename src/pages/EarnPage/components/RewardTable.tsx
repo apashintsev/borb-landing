@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import Pagination from '../../../components/Pagination/Pagination'
 import { useWeb3Context } from '../../../context/Web3Context'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
@@ -8,18 +8,20 @@ import { referalRewardsSlice } from '../../../store/reducers/referalRewardsSlice
 import { AdaptiveTable, Item, TableGrid, TableHead, TableRow } from './styles'
 import { Spinner } from '../../../components/Spinner/Spinner'
 import { toast } from 'react-toastify'
+import { useTranslation } from 'react-i18next'
 
 export function RewardTable() {
+    const { t } = useTranslation()
     const { address } = useWeb3Context()
-    const { rewards, hasNext, hasPrevious, isLoading, errors } = useAppSelector(
+    const { rewards, hasNext, currentPage, hasPrevious, isLoading, errors } = useAppSelector(
         (state) => state.referalRewardsSlice
     )
-    const [currentPage, setCurrentPage] = useState(0)
+    const { setCurrentPage } = referalRewardsSlice.actions
 
     const setPage = (diff: number) => {
-        setCurrentPage(currentPage + diff)
+        dispatch(setCurrentPage(currentPage + diff))
     }
-    
+
     const dispatch = useAppDispatch()
 
     useEffect(() => {
@@ -37,37 +39,41 @@ export function RewardTable() {
         <>
             <TableGrid>
                 <div className="titles">
-                    <p>Wallet address</p>
-                    <p>Asset</p>
-                    <p>Reward earned</p>
+                    <p>{t('EarnPage.Wallet address')}</p>
+                    <p>{t('EarnPage.Asset')}</p>
+                    <p>{t('EarnPage.Reward earned')}</p>
                 </div>
                 <TableHead></TableHead>
-                {!isLoading&& <TableRow>
-                    {rewards?.map((r, idx) => (
-                        <Item key={idx}>
-                            <p>{r.walletAddress}</p>
-                            <p>{r.asset}</p>
-                            <p>${r.rewardEarned}</p>
-                        </Item>
-                    ))}
-                </TableRow>}
+                {!isLoading && (
+                    <TableRow>
+                        {rewards?.map((r, idx) => (
+                            <Item key={idx}>
+                                <p>{r.walletAddress}</p>
+                                <p>{r.asset}</p>
+                                <p>${r.rewardEarned}</p>
+                            </Item>
+                        ))}
+                    </TableRow>
+                )}
             </TableGrid>
             <AdaptiveTable>
                 <div className="titles">
-                    <p>Wallet address</p>
-                    <p>Reward earned</p>
+                    <p>{t('EarnPage.Wallet address')}</p>
+                    <p>{t('EarnPage.Reward earned')}</p>
                 </div>
-                {!isLoading&& <div className="content">
-                    {rewards?.map((r, idx) => (
-                        <div className="row" key={idx}>
-                            <div className="left">
-                                <p>{addressToPointsFormat(r.walletAddress, 8, 41)}</p>
-                                <span>{r.asset}</span>
+                {!isLoading && (
+                    <div className="content">
+                        {rewards?.map((r, idx) => (
+                            <div className="row" key={idx}>
+                                <div className="left">
+                                    <p>{addressToPointsFormat(r.walletAddress, 8, 41)}</p>
+                                    <span>{r.asset}</span>
+                                </div>
+                                <p className="cost">${r.rewardEarned}</p>
                             </div>
-                            <p className="cost">${r.rewardEarned}</p>
-                        </div>
-                    ))}
-                </div>}
+                        ))}
+                    </div>
+                )}
             </AdaptiveTable>
             {isLoading && <Spinner />}
             {errors?.length > 0 && toast.error(errors.join(','))}

@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
@@ -6,6 +7,7 @@ import { useOnClickOutside } from '../lib/useOnClickOutside'
 import { appSettings } from '../store/reducers/appSettingsSlice'
 
 const Nav = () => {
+    const { t } = useTranslation()
     const { isBurger } = useAppSelector((state) => state.appSettings)
     const { setIsBurger, setIsLangaugePopup } = appSettings.actions
     const dispatch = useAppDispatch()
@@ -24,7 +26,7 @@ const Nav = () => {
                         </Logo>
                     </NavLink>
                     <Block>
-                        <Title>MANAGEMENTS</Title>
+                        <Title>{t('Navigation.MANAGEMENTS')}</Title>
                         <NavLink to="/" className="colored">
                             <StyledLink>
                                 <svg
@@ -42,7 +44,7 @@ const Nav = () => {
                                         strokeLinejoin="round"
                                     />
                                 </svg>
-                                <p>Trade</p>
+                                <p>{t('Navigation.Trade')}</p>
                             </StyledLink>
                         </NavLink>
                         <NavLink className="need" to="/earn" onClick={() => dispatch(setIsBurger(false))}>
@@ -61,7 +63,7 @@ const Nav = () => {
                                 />
                             </svg>
 
-                            <p>Earn</p>
+                            <p>{t('Navigation.Earn')}</p>
                         </NavLink>
                         <NavLink className="need" to="/supply" onClick={() => dispatch(setIsBurger(false))}>
                             <svg
@@ -79,11 +81,11 @@ const Nav = () => {
                                 />
                             </svg>
 
-                            <p>Supply</p>
+                            <p>{t('Navigation.Supply')}</p>
                         </NavLink>
                     </Block>
                     <Block>
-                        <Title>Support</Title>
+                        <Title>{t('Navigation.Support')}</Title>
                         <NavLink className="need" to="/messages" onClick={() => dispatch(setIsBurger(false))}>
                             <svg
                                 width="20"
@@ -100,7 +102,7 @@ const Nav = () => {
                                 />
                             </svg>
 
-                            <p>Messages</p>
+                            <p>{t('Navigation.Messages')}</p>
                         </NavLink>
                         <NavLink className="need" to="/settings" onClick={() => dispatch(setIsBurger(false))}>
                             <svg
@@ -125,11 +127,11 @@ const Nav = () => {
                                 </defs>
                             </svg>
 
-                            <p>Settings</p>
+                            <p>{t('Navigation.Settings')}</p>
                         </NavLink>
                     </Block>
                     <Block>
-                        <Title>About</Title>
+                        <Title>{t('Navigation.About')}</Title>
                         <NavLink className="need" to="/about" onClick={() => dispatch(setIsBurger(false))}>
                             <svg
                                 width="20"
@@ -154,7 +156,7 @@ const Nav = () => {
                                 />
                             </svg>
 
-                            <p>Docs</p>
+                            <p>{t('Navigation.Docs')}</p>
                         </NavLink>
                         <StyledLink>
                             <svg
@@ -172,7 +174,7 @@ const Nav = () => {
                                 />
                             </svg>
 
-                            <p>Price feed</p>
+                            <p>{t('Navigation.Price feed')}</p>
                         </StyledLink>
                     </Block>
                 </Top>
@@ -182,9 +184,9 @@ const Nav = () => {
                         dispatch(setIsBurger(false))
                     }}
                 >
-                    <img src="/images/primary/language.svg" alt="" />
+                    <img src="/images/primary/language.svg" alt="Language" />
                     <p>English</p>
-                    <img src="/images/primary/arrow2.svg" alt="" />
+                    <img src="/images/primary/arrow2.svg" alt="Arrow" />
                 </Language>
                 <Bottom>
                     <Icons>
@@ -239,9 +241,9 @@ const Nav = () => {
                     </Icons>
 
                     <Row>
-                        <BottomText>© 2022 BorB</BottomText>
+                        <BottomText>© {new Date().getFullYear()} BorB</BottomText>
                         <Line />
-                        <BottomLink>Privacy Policy</BottomLink>
+                        <BottomLink>{t('Footer.Privacy Policy')}</BottomLink>
                     </Row>
                 </Bottom>
             </StyledNav>

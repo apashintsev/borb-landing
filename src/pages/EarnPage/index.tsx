@@ -1,31 +1,18 @@
-import React, { useMemo, useRef } from 'react'
-import { Swiper, SwiperSlide } from 'swiper/react'
+import { useTranslation } from 'react-i18next'
 import { Faq } from '../../components/Faq'
-import { useWeb3Context } from '../../context/Web3Context'
-import { useMediaQuery } from '../../hooks/useMediaQuery'
-import { allowedAssets } from '../../lib/data'
-import { addressToPointsFormat } from '../../lib/sharedFunctions'
-import { ReferalBlock } from './components/ReferalBlock'
 import { RewardTable } from './components/RewardTable'
 import { Slider } from './components/Slider'
-import {
-    RewardTitle,
-    StyledEarn,
-    SubText,
-    Title,
-} from './components/styles'
+import { RewardTitle, StyledEarn, SubText, Title } from './components/styles'
 
 const EarnPage = () => {
+    const { t } = useTranslation()
     return (
         <StyledEarn>
             <div className="container">
-                <Title>Earn crypto by referring friends</Title>
-                <SubText>
-                    Share your referal link, invite friend and you'll be
-                    rewarded with 50% of their trading fees
-                </SubText>
+                <Title>{t('EarnPage.Title')}</Title>
+                <SubText>{t('EarnPage.Subitle')}</SubText>
                 <Slider />
-                <RewardTitle>Reward</RewardTitle>
+                <RewardTitle>{t('EarnPage.Reward')}</RewardTitle>
                 <RewardTable />
                 <div className="faq">
                     <Faq />

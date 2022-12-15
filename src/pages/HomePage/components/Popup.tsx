@@ -6,8 +6,10 @@ import { useOnClickOutside } from '../../../lib/useOnClickOutside'
 import { Column, Head, Popup, PopupBottom, PopupContent, PopupTitle } from './main'
 import { allowedCurrencies, allowedTimeframes } from '../../../lib/data'
 import SmallChart from '../../../components/SmallChart/SmallChart'
+import { useTranslation } from 'react-i18next'
 
 export function PopupWindow() {
+    const { t } = useTranslation()
     useUserNotifications()
     const { isPopupOpen, closedBet } = useAppSelector((state) => state.gameSlice)
     const { setIsPopupOpen } = gameSlice.actions
@@ -27,7 +29,7 @@ export function PopupWindow() {
         <Popup show={isPopupOpen}>
             <PopupContent ref={ref}>
                 <Head>
-                    <PopupTitle>Trade result</PopupTitle>
+                    <PopupTitle>{t('HomePage.Popup.Title')}</PopupTitle>
                     <img src="/images/home/close.svg" alt="Close" onClick={() => dispatch(setIsPopupOpen(false))} />
                 </Head>
                 <div style={{ height: '100px' }}>
@@ -35,11 +37,11 @@ export function PopupWindow() {
                 </div>
                 <PopupBottom>
                     <Column>
-                        <p>Asset</p>
+                        <p>{t('HomePage.Popup.Asset')}</p>
                         <img src={betCurrency?.img} alt={betCurrency?.name} />
                     </Column>
                     <Column>
-                        <p>Direction</p>
+                        <p>{t('HomePage.Popup.Direction')}</p>
                         <svg
                             className={`first_td_adaptive ${!directionUp && 'rotate180deg'}`}
                             width="32"
@@ -52,11 +54,11 @@ export function PopupWindow() {
                         </svg>
                     </Column>
                     <Column>
-                        <p>Timeframe</p>
+                        <p>{t('HomePage.Popup.Timeframe')}</p>
                         <span>{timeframe}</span>
                     </Column>
                     <Column>
-                        <p>Result</p>
+                        <p>{t('HomePage.Popup.Result')}</p>
                         <span className={`price-${isWin ? 'increase' : 'drop'} last`}>
                             {isWin ? `+${closedBet.potentialReward} ` : `-${closedBet.amount} `}
                             USD
