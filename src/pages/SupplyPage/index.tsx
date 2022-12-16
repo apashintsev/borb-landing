@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks/redux'
 import { BorbGame__factory } from '../../@types/contracts/BorbGame__factory'
 import { gameSlice } from '../../store/reducers/gameSlice'
 import { ethers } from 'ethers'
-import { SelectAsset } from '../HomePage/components/SelectAsset'
+import { SelectAsset } from '../../components/SelectAsset/SelectAsset'
 import { Pool__factory } from '../../@types/contracts/Pool__factory'
 import { getBalance, increaseAllowance, isAllowed } from '../../store/api/contracts'
 import { supplySlice } from '../../store/reducers/supplySlice'
@@ -49,6 +49,7 @@ const SupplyPage = () => {
             const gameContract = BorbGame__factory.connect(gameContractAddress, web3Provider!)
             const poolContract = Pool__factory.connect(poolContractAddress, web3Provider!)
             try {
+                clearAmounts()
                 const assetAddress = await gameContract.getAssetAddress(asset.name)
                 dispatch(setAssetContract(assetAddress))
                 const tokenPlusAddress = await poolContract.getAssetTokenPlusAddress(asset.name)
@@ -74,14 +75,26 @@ const SupplyPage = () => {
 
     async function setInputValueHandler(value: number) {
         try {
-            const balance = activeTabName === 'Supply' ? userBalance : tokenPlusBalance
             let newBetValue = ethers.utils.parseUnits(value.toString(), 6)
-            if (value > Number.parseFloat(ethers.utils.formatUnits(balance, 6))) {
-                newBetValue = balance
+            if (activeTabName === 'Supply') {
+                if (value > Number.parseFloat(ethers.utils.formatUnits(userBalance, 6))) {
+                    newBetValue = userBalance
+                }
+                const valueN = Number.parseFloat(
+                    Math.abs(Number.parseFloat(ethers.utils.formatUnits(newBetValue, 6))).toFixed(6)
+                )
+                setAmount(valueN)
+                setAmountTokenPlus(Number.parseFloat((valueN * exchangeRate).toFixed(6)))
+            } else {
+                if (value > Number.parseFloat(ethers.utils.formatUnits(tokenPlusBalance, 6))) {
+                    newBetValue = tokenPlusBalance
+                }
+                const valueN = Number.parseFloat(
+                    Math.abs(Number.parseFloat(ethers.utils.formatUnits(newBetValue, 6))).toFixed(6)
+                )
+                setAmountTokenPlus(valueN)
+                setAmount(Number.parseFloat((valueN * exchangeRate).toFixed(6)))
             }
-            const valueN = Math.abs(Number.parseFloat(ethers.utils.formatUnits(newBetValue, 6)))
-            setAmount(valueN)
-            setAmountTokenPlus(valueN * exchangeRate)
         } catch {
             clearAmounts()
         }
@@ -95,7 +108,6 @@ const SupplyPage = () => {
         try {
             const formattedAmount = ethers.utils.parseUnits(amount.toString(), 6)
             if (await isAllowed(address!, assetContractAddress!, web3Provider!, formattedAmount, poolContractAddress)) {
-                console.log(ethers.utils.parseUnits(amount.toString(), 6).toString())
                 const result = await poolContract.connect(web3Provider!.getSigner()).makeDeposit(
                     asset.id,
                     formattedAmount,
@@ -143,6 +155,7 @@ const SupplyPage = () => {
         const poolContract = Pool__factory.connect(poolContractAddress, web3Provider!)
         try {
             const formattedAmount = ethers.utils.parseUnits(amountTokenPlus.toFixed(6).toString(), 6)
+            //console.log(ethers.utils.parseUnits(amountTokenPlus.toString(), 6).toString())
             if (
                 await isAllowed(
                     address!,
@@ -226,12 +239,12 @@ const SupplyPage = () => {
                             )}
                         </TitleContainer>
                         <div className="input-wrapper">
-                            <SelectAsset />
+                            <SelectAsset addPlus={activeTabName != 'Supply'} />
                             <input
                                 type="number"
                                 className="input"
                                 placeholder="Amount"
-                                value={amount}
+                                value={activeTabName === 'Supply' ? amount : amountTokenPlus}
                                 onChange={(e) => setInputValueHandler(Number.parseFloat(e.target.value))}
                             />
                         </div>
@@ -244,12 +257,18 @@ const SupplyPage = () => {
                                 <CurrencyWrapper>
                                     <img src={asset.img} alt={asset.name} />
                                 </CurrencyWrapper>
-                                <span>{`${asset.name}+`}</span>
+                                <span>{`${asset.name}${activeTabName != 'Supply' ? '' : '+'}`}</span>
                             </SelectWrapper>
-                            <input type="number" className="input" disabled value={amountTokenPlus} />
+                            <input
+                                type="number"
+                                className="input"
+                                disabled
+                                value={activeTabName === 'Supply' ? amountTokenPlus : amount}
+                            />
                         </div>
                     </InputWrapper>
                 </InputContainer>
+
                 {!isMobile && (
                     <SettingsTitle>{`${t('SupplyPage.Balance')}: ${ethers.utils.formatUnits(userBalance, 6)} ${
                         asset.name

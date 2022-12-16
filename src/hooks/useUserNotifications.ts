@@ -42,6 +42,10 @@ export const useUserNotifications = () => {
                         dispatch(refreshClosedBets())
                         dispatch(refreshActiveBets())
                     })
+                    connection.on('BetAdded', (payload: BetVm) => {
+                        dispatch(refreshClosedBets())
+                        dispatch(refreshActiveBets())
+                    })
                 })
                 .catch((e: any) => console.log('Connection failed: ', e))
         }

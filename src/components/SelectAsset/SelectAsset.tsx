@@ -1,11 +1,15 @@
 import * as React from 'react'
 import styled from 'styled-components'
-import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
-import { allowedAssets } from '../../../lib/data'
-import { useOnClickOutside } from '../../../lib/useOnClickOutside'
-import { gameSlice } from '../../../store/reducers/gameSlice'
+import { useAppDispatch, useAppSelector } from '../../hooks/redux'
+import { allowedAssets } from '../../lib/data'
+import { useOnClickOutside } from '../../lib/useOnClickOutside'
+import { gameSlice } from '../../store/reducers/gameSlice'
 
-export function SelectAsset() {
+interface ISelectAssetProps {
+    addPlus?: boolean
+}
+
+export const SelectAsset: React.FunctionComponent<ISelectAssetProps> = ({ addPlus }) => {
     const { asset } = useAppSelector((state) => state.gameSlice)
     const { setAsset } = gameSlice.actions
     const dispatch = useAppDispatch()
@@ -22,7 +26,10 @@ export function SelectAsset() {
                 <CurrencyWrapper>
                     <img src={asset.img} alt={asset.name} />
                 </CurrencyWrapper>
-                <span>{asset.name}</span>
+                <span>
+                    {asset.name}
+                    {addPlus && '+'}
+                </span>
                 <svg
                     width="16"
                     height="16"
@@ -46,7 +53,10 @@ export function SelectAsset() {
                             }}
                         >
                             <img src={item.img} alt={item.name} />
-                            <p>{item.name}</p>
+                            <p>
+                                {item.name}
+                                {addPlus && '+'}
+                            </p>
                         </div>
                     ))}
                 </SelectBody>

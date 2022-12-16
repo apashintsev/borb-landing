@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react'
 import { BorbGame__factory } from '../../../@types/contracts/BorbGame__factory'
 import { BigNumber, ethers } from 'ethers'
 import { getParsedEthersError } from '@enzoferey/ethers-error-parser'
-import { SelectAsset } from './SelectAsset'
+import { SelectAsset } from '../../../components/SelectAsset/SelectAsset'
 import { getBalance, increaseAllowance, isAllowed } from '../../../store/api/contracts'
 import { useTranslation } from 'react-i18next'
 
