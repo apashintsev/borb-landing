@@ -7,7 +7,6 @@ import { toast } from 'react-toastify'
 import { useEffect, useState } from 'react'
 import { BorbGame__factory } from '../../../@types/contracts/BorbGame__factory'
 import { BigNumber, ethers } from 'ethers'
-import { getParsedEthersError } from '@enzoferey/ethers-error-parser'
 import { SelectAsset } from '../../../components/SelectAsset/SelectAsset'
 import { getBalance, increaseAllowance, isAllowed } from '../../../store/api/contracts'
 import { useTranslation } from 'react-i18next'
@@ -104,31 +103,30 @@ export function BetCard() {
                         error: t<string>('HomePage.Error 🤯'),
                     })
                     .then((_) => setReload((prev) => prev + 1))
+                    .catch((e) => {
+                        console.log({ e })
+                        const decoded = BorbGame__factory.createInterface().decodeErrorResult(
+                            'NotEnoughtPoolBalanceError',
+                            e.transaction.data
+                        )
+                        console.log({ decoded })
+                    })
             } else {
                 await increaseAllowance(assetContractAddress, web3Provider!, poolContractAddress)
             }
         } catch (error: any) {
             console.log({ error })
-            console.log('=========================================')
-            const parsedEthersError = getParsedEthersError(error)
-            console.log({ parsedEthersError })
-            //console.log(JSON.stringify(error))
-            //console.log(JSON.stringify(error.topics))
-            //console.log(JSON.stringify(error.data))
-
             if (error.code === ERROR_CODE_TX_REJECTED_BY_USER) {
                 toast.info('TX_REJECTED_BY_USER')
                 return
             } else {
+                const decoded = BorbGame__factory.createInterface().decodeErrorResult('TimeframeNotExsistError', error)
+                console.log({ decoded })
+                if (error.errorName) {
+                    toast.error(t<string>(error.errorName))
+                }
                 toast.error(error.message)
             }
-            // @ts-ignore
-            //const revertData = error.data
-
-            //const decodedError = gameContract.interface.parseError(error.data.data)
-
-            console.log(`Transaction failed:`)
-            //console.log({ decodedError })
         }
     }
 
