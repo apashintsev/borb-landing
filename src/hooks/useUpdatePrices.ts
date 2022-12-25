@@ -46,7 +46,7 @@ export const useUpdatePrices = () => {
                         (payload: NewPriceInUsdVm) => {
                             //todo destructurize /player?course=JS&lessonId=63297a9684ab95f41e81c175
                             const newPrice = Object.entries(payload).find(
-                                (x) => x[0].toUpperCase() == currency.ticker
+                                (x) => x[0].toUpperCase() === currency.ticker
                             )?.[1]
                             dispatch(setCurrencyPrice(newPrice))
                         }

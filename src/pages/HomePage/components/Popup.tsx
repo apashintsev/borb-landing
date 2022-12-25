@@ -20,10 +20,10 @@ export function PopupWindow() {
 
     const betCurrency = allowedCurrencies.find((x) => x.ticker === closedBet.currency)
     const directionUp = closedBet.betType === 0
-    const timeframe = allowedTimeframes.find((x) => x.value == closedBet.timeframe)?.name
+    const timeframe = allowedTimeframes.find((x) => x.value === closedBet.timeframe)?.name
     const isWin =
-        (closedBet.betType == 0 && closedBet.lockPrice < closedBet.closePrice) ||
-        (closedBet.betType == 1 && closedBet.lockPrice > closedBet.closePrice)
+        (closedBet.betType === 0 && closedBet.lockPrice < closedBet.closePrice) ||
+        (closedBet.betType === 1 && closedBet.lockPrice > closedBet.closePrice)
 
     return (
         <Popup show={isPopupOpen}>

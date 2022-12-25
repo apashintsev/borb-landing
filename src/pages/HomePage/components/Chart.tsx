@@ -1,12 +1,28 @@
-import { AdvancedChart } from 'react-tradingview-embed'
-import { useAppSelector } from '../../../hooks/redux'
+import { useEffect } from 'react'
+import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 import { useUpdatePrices } from '../../../hooks/useUpdatePrices'
+import { AmChart5 } from './AmChart5'
 import { Left } from './main'
 import { Timeframes } from './Timeframes'
+import { getPoints } from '../../../store/api/prices'
 
-export function Chart() {
-    const { currencyPrice } = useAppSelector((state) => state.gameSlice)
+
+export const Chart = () => {
     useUpdatePrices()
+    const { currencyPrice, currency } = useAppSelector((state) => state.gameSlice)
+    const dispatch = useAppDispatch()
+
+    useEffect(() => {
+        dispatch(
+            getPoints({
+                currency: currency,
+                timeframe: 300,
+                pageNumber: 1,
+                pageSize: 500,
+            })
+        )
+    }, [dispatch, currency])
+
     return (
         <Left>
             <div className="left_row">
@@ -14,7 +30,8 @@ export function Chart() {
                 <Timeframes />
 
             </div>
-                <AdvancedChart widgetProps={{ theme: 'dark' }} />            
+            <AmChart5 />
+            {/* <AdvancedChart widgetProps={{ theme: 'dark' }} />             */}
         </Left>
     )
 }
