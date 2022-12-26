@@ -1,8 +1,24 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { BigNumber, ethers } from 'ethers'
+import { ApiResult } from '../../@types/ApiResponse'
 import { BetVm } from '../../@types/Game/bet'
 import { AssetTicker, CurrencyTicker, TimeframeName } from '../../@types/Game/game'
+import { ListResponse } from '../../@types/ListResponse'
 import { allowedAssets, allowedCurrencies, allowedTimeframes } from '../../lib/data'
+import { getPoints, IPriceVM } from '../api/prices'
+
+interface IPointsList {
+    currentPage: number,
+    pointsList: IPriceVM[],
+    hasNext: boolean,
+    hasPrevious: boolean,
+    pageSize: number,
+    totalCount: number,
+    totalPages: number,
+    isLoading: boolean
+    toggleRefresh: boolean
+    errors: string[]
+}
 
 export const initialState = {
     ref: ethers.constants.AddressZero,
@@ -17,6 +33,7 @@ export const initialState = {
     currencyPrice: 25000 as number,
     isPopupOpen: false,
     closedBet: {} as BetVm,
+    points: {} as IPointsList
 }
 export const gameSlice = createSlice({
     name: 'game',
@@ -51,6 +68,27 @@ export const gameSlice = createSlice({
         },
         setClosedBet(state, action: PayloadAction<BetVm>) {
             state.closedBet = action.payload
+        },
+    },
+    extraReducers: {
+        [getPoints.pending.type]: (state) => {
+            state.points.isLoading = true
+        },
+        [getPoints.fulfilled.type]: (state, action: PayloadAction<ApiResult<ListResponse<IPriceVM>>>) => {
+            const { currentPage, data, totalCount, hasNext, hasPrevious, pageSize, totalPages } = action.payload.payload
+            state.points.currentPage = currentPage
+            state.points.pointsList = data
+            state.points.hasNext = hasNext
+            state.points.hasPrevious = hasPrevious
+            state.points.pageSize = pageSize
+            state.points.totalCount = totalCount
+            state.points.totalPages = totalPages
+            state.points.isLoading = false
+
+        },
+        [getPoints.rejected.type]: (state, action: PayloadAction<any>) => {
+            state.points.errors = [...action.payload.Errors]
+            state.points.isLoading = false
         },
     },
 })
