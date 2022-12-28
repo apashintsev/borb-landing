@@ -2,7 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../../hooks/redux'
 import { allowedCurrencies } from '../../lib/data'
-import { useOnClickOutside } from '../../lib/useOnClickOutside'
+import { useOnClickOutside } from '../../hooks/useOnClickOutside'
 import { gameSlice } from '../../store/reducers/gameSlice'
 
 export default function SelectCurrency() {

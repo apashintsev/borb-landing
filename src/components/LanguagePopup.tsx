@@ -2,7 +2,7 @@ import { useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
-import { useOnClickOutside } from '../lib/useOnClickOutside'
+import { useOnClickOutside } from '../hooks/useOnClickOutside'
 import { appSettings } from '../store/reducers/appSettingsSlice'
 
 const data = [

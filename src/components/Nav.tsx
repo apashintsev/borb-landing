@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { NavLink } from 'react-router-dom'
 import styled from 'styled-components'
 import { useAppDispatch, useAppSelector } from '../hooks/redux'
-import { useOnClickOutside } from '../lib/useOnClickOutside'
+import { useOnClickOutside } from '../hooks/useOnClickOutside'
 import { appSettings } from '../store/reducers/appSettingsSlice'
 
 const Nav = () => {

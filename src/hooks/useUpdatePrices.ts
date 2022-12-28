@@ -43,8 +43,7 @@ export const useUpdatePrices = () => {
                 .then(() => {
                     connection.on(
                         'NewPriceSetted',
-                        (payload: NewPriceInUsdVm) => {
-                            //todo destructurize /player?course=JS&lessonId=63297a9684ab95f41e81c175
+                        (payload: NewPriceInUsdVm) => {                            
                             const newPrice = Object.entries(payload).find(
                                 (x) => x[0].toUpperCase() === currency.ticker
                             )?.[1]
