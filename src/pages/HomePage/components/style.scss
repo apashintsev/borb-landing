@@ -1,0 +1,35 @@
+.customClass {
+    animation: blinker 1s linear infinite;
+  }
+  
+  @keyframes blinker {
+    50% {
+      opacity: 0;
+    }
+  }
+
+
+  .loading {
+    margin-top: 10em;
+    text-align: center;
+    color: gray;
+  }
+  
+  .highcharts-point.highcharts-color-1 {
+    animation-duration: 0.5s;
+    animation-name: blinking;
+    animation-iteration-count: 4;
+    animation-timing-function: ease-in-out;
+  }
+  
+  @keyframes blinking {
+    0% {
+      fill: red;
+    }
+    50% {
+      fill: green;
+    }
+    100% {
+      fill: red;
+    }
+  }

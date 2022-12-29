@@ -48,6 +48,11 @@ export const useUpdatePrices = () => {
                             const newPrice = Object.entries(payload).find(
                                 (x) => x[0].toUpperCase() === currency.ticker
                             )?.[1]
+                            // const newPrice = payload[currency.ticker.toLocaleLowerCase()]
+                            
+                            // console.log('currency=========>', currency)
+                            // console.log('newPrice=========>', newPrice)
+                            // console.log('payload==============>', payload)
                             dispatch(setCurrencyPrice(newPrice))
                         }
                     )

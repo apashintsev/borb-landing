@@ -5,11 +5,12 @@ import { AmChart5 } from './AmChart5'
 import { Left } from './main'
 import { Timeframes } from './Timeframes'
 import { getPoints } from '../../../store/api/prices'
-
+import { HCH } from './HCH'
 
 export const Chart = () => {
     useUpdatePrices()
     const { currencyPrice, currency } = useAppSelector((state) => state.gameSlice)
+    console.log('Chart ~ currency', currencyPrice)
     const dispatch = useAppDispatch()
 
     useEffect(() => {
@@ -17,11 +18,11 @@ export const Chart = () => {
             getPoints({
                 currency: currency,
                 timeframe: 300,
-                pageNumber: 1,
-                pageSize: 500,
+                pageNumber: 0,
+                pageSize: 100,
             })
         )
-    }, [dispatch, currency])
+    }, [dispatch])
 
     return (
         <Left>
@@ -30,7 +31,8 @@ export const Chart = () => {
                 <Timeframes />
 
             </div>
-            <AmChart5 />
+            {/* <AmChart5 /> */}
+            <HCH />
             {/* <AdvancedChart widgetProps={{ theme: 'dark' }} />             */}
         </Left>
     )
