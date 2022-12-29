@@ -6,7 +6,9 @@ import am5themes_Animated from "@amcharts/amcharts5/themes/Animated";
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 
 export const AmChart5 = () => {
-    const { points, currencyPrice } = useAppSelector((state) => state.gameSlice)
+    const { points } = useAppSelector((state) => state.pointsSlice)
+    const { currencyPrice } = useAppSelector((state) => state.gameSlice)
+    console.log('AmChart5 ~ currencyPrice', currencyPrice)
     console.log('00000', points)
 
     useLayoutEffect(() => {
@@ -23,7 +25,7 @@ export const AmChart5 = () => {
                 value: point.value,
                 // bullet: false,
             }
-        });
+        }).sort((a, b) => a.date - b.date);
         
         const root = am5.Root.new("chartDiv");
 
@@ -73,8 +75,8 @@ export const AmChart5 = () => {
             return data;
         }
 
-        // const data = generateDatas(2000);
-        const data = pointsData;
+        const data = generateDatas(2000);
+        // const data = pointsData;
         console.log(777, pointsData)
         console.log(333, generateDatas(2000))
 
@@ -228,7 +230,7 @@ export const AmChart5 = () => {
 
         // Update data every second
         setInterval(function () {
-            // addData();
+            addData();
         }, 1000);
 
         function addData() {
@@ -243,27 +245,29 @@ export const AmChart5 = () => {
             series.data.removeIndex(0);
             series.data.push({
                 date: new Date().getTime(),
-                value: currencyPrice,
+                // value: currencyPrice,
+                value: newValue,
             });
 
             const newDataItem = series.dataItems[ series.dataItems.length - 1 ];
             newDataItem.animate({
                 key: "valueYWorking",
-                to: currencyPrice,
+                // to: currencyPrice,
+                to: newValue,
                 from: lastValue,
                 duration: 600,
                 easing: easing
             });
 
             // use the bullet of last data item so that a new sprite is not created
-            //   newDataItem.bullets = [];
-            //   newDataItem.bullets[0] = lastDataItem?.bullets[0];
+              newDataItem.bullets = [];
+              newDataItem.bullets[0] = lastDataItem?.bullets[0];
             //   newDataItem?.bullets[0]?.get("sprite")?.dataItem = newDataItem;
             // console.log('addData ~ newDataItem?.bullets[0]?.get("sprite")', newDataItem)
             // console.log('addData ~ newDataItem?.bullets[0]?.get("sprite")', lastDataItem)
             // reset bullets
-            //   lastDataItem.dataContext.bullet = false;
-            //   lastDataItem.bullets = [];
+              lastDataItem.dataContext.bullet = false;
+              lastDataItem.bullets = [];
 
             const animation = newDataItem.animate({
                 key: "locationX",

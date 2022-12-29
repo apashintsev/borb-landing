@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 import { useUpdatePrices } from '../../../hooks/useUpdatePrices'
 import { AmChart5 } from './AmChart5'
+import { AmChart } from './AmChart'
 import { Left } from './main'
 import { Timeframes } from './Timeframes'
 import { getPoints } from '../../../store/api/prices'
@@ -32,6 +33,7 @@ export const Chart = () => {
 
             </div>
             {/* <AmChart5 /> */}
+            {/* <AmChart /> */}
             <HCH />
             {/* <AdvancedChart widgetProps={{ theme: 'dark' }} />             */}
         </Left>

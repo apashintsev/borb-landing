@@ -3,9 +3,11 @@ import Highcharts from 'highcharts/highstock'
 import HighchartsReact from 'highcharts-react-official'
 import { useAppSelector } from '../../../hooks/redux'
 
+import { HubConnectionBuilder } from '@microsoft/signalr'
+import * as SignalR from '@aspnet/signalr'
+
 import HC_more from 'highcharts/highcharts-more' //module
 HC_more(Highcharts) //init module
-
 ;(function (H) {
     Highcharts.Chart.prototype.callbacks.push(function (chart) {
         H.addEvent(
@@ -57,7 +59,8 @@ HC_more(Highcharts) //init module
 
 export const HCH = () => {
     const { points } = useAppSelector((state) => state.pointsSlice)
-    const { currencyPrice } = useAppSelector((state) => state.gameSlice)
+    const { currencyPrice, currency } = useAppSelector((state) => state.gameSlice)
+
     console.log('-----------', currencyPrice)
 
     const [pointsData, setPointsData] = useState([])
@@ -104,44 +107,95 @@ export const HCH = () => {
                 const series = this.series[0]
                 console.log('HCH ~ this', this)
 
-                //set marker on last point
-                series?.data[series.data.length - 1]?.update({
-                    marker: {
-                        enabled: false,
-                    },
-                })
+                const newConnection = new HubConnectionBuilder()
+                    .withUrl(`https://borbfinance.ru/wssrates`, {
+                        withCredentials: false,
+                        skipNegotiation: true,
+                        transport: SignalR.HttpTransportType.WebSockets,
+                    })
+                    .withAutomaticReconnect()
+                    .build()
 
-                setInterval(function () {
-                    const x = new Date().getTime() // current time
-                    const y = Math.random()
+                newConnection.start().then(() => {
+                    newConnection.on('NewPriceSetted', (payload) => {
+                        const newPrice = payload[currency.ticker.toLocaleLowerCase()]
 
-                    const len = series?.data.length
+                        console.log('newPrice=========>', newPrice)
 
-                    // if (series.data[len - 1]) {
-                    series.data[len - 1].update(
-                        {
+                        //set marker on last point
+                        series?.data[series.data.length - 1]?.update({
                             marker: {
                                 enabled: false,
                             },
-                        },
-                        false
-                    )
-                    // }
-                    console.log('<<<<<<<first>>>>>>>', currencyPrice)
-                    series.addPoint(
-                        {
-                            x: x,
-                            y: currencyPrice,
-                            // y: y,
-                            marker: {
-                                enabled: true,
-                                radius: 4,
+                        })
+
+                        const x = new Date().getTime() // current time
+                        const len = series?.data.length
+
+                        // series.points[len - 1].update(
+                        series.data[len - 1].update(
+                            {
+                                marker: {
+                                    enabled: false,
+                                },
                             },
-                        },
-                        true,
-                        true
-                    )
-                }, 1000)
+                            false
+                        )
+
+                        series.addPoint(
+                            {
+                                x: x,
+                                y: newPrice,
+                                marker: {
+                                    enabled: true,
+                                    radius: 4,
+                                },
+                            },
+                            true,
+                            true
+                        )
+                    })
+                })
+
+                //set marker on last point
+                // series?.data[series.data.length - 1]?.update({
+                //     marker: {
+                //         enabled: false,
+                //     },
+                // })
+
+                // setInterval(function () {
+                //     const x = new Date().getTime() // current time
+                //     const y = Math.random()
+
+                //     const len = series?.data.length
+
+                //     // if (series.data[len - 1]) {
+                //     // series.points[len - 1].update(
+                //     series.data[len - 1].update(
+                //         {
+                //             marker: {
+                //                 enabled: false,
+                //             },
+                //         },
+                //         false
+                //     )
+                //     // }
+
+                //     series.addPoint(
+                //         {
+                //             x: x,
+                //             y: currencyPrice,
+                //             // y: y,
+                //             marker: {
+                //                 enabled: true,
+                //                 radius: 4,
+                //             },
+                //         },
+                //         true,
+                //         true
+                //     )
+                // }, 1000)
             },
         },
     })
