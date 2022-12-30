@@ -59,7 +59,7 @@ HC_more(Highcharts) //init module
 
 export const HCH = () => {
     const { points } = useAppSelector((state) => state.pointsSlice)
-    const { currencyPrice, currency } = useAppSelector((state) => state.gameSlice)
+    const { currencyPrice, currency, timeframe } = useAppSelector((state) => state.gameSlice)
 
     console.log('-----------', currencyPrice)
 
@@ -120,82 +120,61 @@ export const HCH = () => {
                     newConnection.on('NewPriceSetted', (payload) => {
                         const newPrice = payload[currency.ticker.toLocaleLowerCase()]
 
-                        console.log('newPrice=========>', newPrice)
-
-                        //set marker on last point
-                        series?.data[series.data.length - 1]?.update({
-                            marker: {
-                                enabled: false,
-                            },
-                        })
-
-                        const x = new Date().getTime() // current time
                         const len = series?.data.length
 
-                        // series.points[len - 1].update(
-                        series.data[len - 1].update(
-                            {
+                        const x = new Date().getTime() // current time
+
+                        // console.log('newPrice=========>4')
+
+                        if (x - series.data[len - 1].x > timeframe.value * 1000) {
+                            //set marker on last point
+                            series?.data[len - 1]?.update({
                                 marker: {
                                     enabled: false,
                                 },
-                            },
-                            false
-                        )
+                            })
 
-                        series.addPoint(
-                            {
-                                x: x,
-                                y: newPrice,
-                                marker: {
-                                    enabled: true,
-                                    radius: 4,
+                            // series.points[len - 1].update(
+                            series.data[len - 1].update(
+                                {
+                                    marker: {
+                                        enabled: false,
+                                    },
                                 },
-                            },
-                            true,
-                            true
-                        )
+                                false
+                            )
+
+                            series.addPoint(
+                                {
+                                    x: x,
+                                    y: newPrice,
+                                    marker: {
+                                        enabled: true,
+                                        fillColor: '#ff577e',
+                                        radius: 5,
+                                    },
+                                },
+                                true,
+                                true
+                            )
+                        } else {
+                            series.data[len - 1].update(
+                                {
+                                    // x: x,
+                                    y: newPrice,
+                                    marker: {
+                                        enabled: true,
+                                        fillColor: '#ff577e',
+                                        radius: 5,
+                                    },
+                                    className: 'customClass',
+                                },
+                                true,
+                                true
+                            )
+                        }
                     })
                 })
-
-                //set marker on last point
-                // series?.data[series.data.length - 1]?.update({
-                //     marker: {
-                //         enabled: false,
-                //     },
-                // })
-
-                // setInterval(function () {
-                //     const x = new Date().getTime() // current time
-                //     const y = Math.random()
-
-                //     const len = series?.data.length
-
-                //     // if (series.data[len - 1]) {
-                //     // series.points[len - 1].update(
-                //     series.data[len - 1].update(
-                //         {
-                //             marker: {
-                //                 enabled: false,
-                //             },
-                //         },
-                //         false
-                //     )
-                //     // }
-
-                //     series.addPoint(
-                //         {
-                //             x: x,
-                //             y: currencyPrice,
-                //             // y: y,
-                //             marker: {
-                //                 enabled: true,
-                //                 radius: 4,
-                //             },
-                //         },
-                //         true,
-                //         true
-                //     )
-                // }, 1000)
             },
         },
     })
@@ -235,7 +214,7 @@ export const HCH = () => {
         },
     })
 
-    if (!points?.pointsList?.length) return null
+    if (!points?.pointsList?.length || points.isLoading) return null
 
     return (
         <HighchartsReact
