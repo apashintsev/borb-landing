@@ -153,6 +153,7 @@ export const HCH = () => {
                                         fillColor: '#ff577e',
                                         radius: 5,
                                     },
+                                    className: 'dot',
                                 },
                                 true,
                                 true
@@ -160,14 +161,13 @@ export const HCH = () => {
                         } else {
                             series.data[len - 1].update(
                                 {
-                                    // x: x,
                                     y: newPrice,
                                     marker: {
                                         enabled: true,
                                         fillColor: '#ff577e',
                                         radius: 5,
                                     },
-                                    className: 'customClass',
+                                    className: 'dot',
                                 },
                                 true,
                                 true
