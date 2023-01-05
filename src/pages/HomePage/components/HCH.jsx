@@ -8,6 +8,7 @@ import * as SignalR from '@aspnet/signalr'
 
 import HC_more from 'highcharts/highcharts-more' //module
 HC_more(Highcharts) //init module
+
 ;(function (H) {
     Highcharts.Chart.prototype.callbacks.push(function (chart) {
         H.addEvent(
@@ -57,11 +58,32 @@ HC_more(Highcharts) //init module
     })
 })(Highcharts)
 
+function positionMarker(series) {
+    const chart = series?.chart
+    const lastPoint = series?.points[series?.points?.length - 1]
+
+    if (lastPoint?.plotX === series?.data[series.data.length - 1].plotX) {
+        chart?.pulseMarker?.animate(
+            {
+                x: lastPoint.plotX - chart.plotLeft - chart.spacing[0],
+                y: lastPoint.plotY + chart.plotTop + chart.spacing[2] - 3,
+            },
+            true
+        )
+    } else {
+        chart?.pulseMarker?.animate(
+            {
+                x: lastPoint.plotX + 1111,
+                y: lastPoint.plotY + 1111,
+            },
+            true
+        )
+    }
+}
+
 export const HCH = () => {
     const { points } = useAppSelector((state) => state.pointsSlice)
-    const { currencyPrice, currency, timeframe } = useAppSelector((state) => state.gameSlice)
-
-    console.log('-----------', currencyPrice)
+    const { currency, timeframe } = useAppSelector((state) => state.gameSlice)
 
     const [pointsData, setPointsData] = useState([])
     const chartRef = useRef(null)
@@ -102,10 +124,16 @@ export const HCH = () => {
         marginRight: 50,
         events: {
             load: function () {
+                const chart = this
+                chart.pulseMarker = this.renderer
+                    .text("<span class='mgo-widget-call_pulse'></span>", 200, 200, true)
+                    .add()
+
                 // set up the updating of the chart each second
-                // if (this.series.length) return;
                 const series = this.series[0]
-                console.log('HCH ~ this', this)
+                // console.log('HCH ~ this', this)
+
+                positionMarker(this?.chart?.series?.[0])
 
                 const newConnection = new HubConnectionBuilder()
                     .withUrl(`https://borbfinance.ru/wssrates`, {
@@ -124,36 +152,13 @@ export const HCH = () => {
 
                         const x = new Date().getTime() // current time
 
-                        // console.log('newPrice=========>4')
+                        // console.log('newPrice=========>', newPrice)
 
                         if (x - series.data[len - 1].x > timeframe.value * 1000) {
-                            //set marker on last point
-                            series?.data[len - 1]?.update({
-                                marker: {
-                                    enabled: false,
-                                },
-                            })
-
-                            // series.points[len - 1].update(
-                            series.data[len - 1].update(
-                                {
-                                    marker: {
-                                        enabled: false,
-                                    },
-                                },
-                                false
-                            )
-
                             series.addPoint(
                                 {
                                     x: x,
                                     y: newPrice,
-                                    marker: {
-                                        enabled: true,
-                                        fillColor: '#ff577e',
-                                        radius: 5,
-                                    },
-                                    className: 'dot',
                                 },
                                 true,
                                 true
@@ -162,17 +167,12 @@ export const HCH = () => {
                             series.data[len - 1].update(
                                 {
                                     y: newPrice,
-                                    marker: {
-                                        enabled: true,
-                                        fillColor: '#ff577e',
-                                        radius: 5,
-                                    },
-                                    className: 'dot',
                                 },
                                 true,
                                 true
                             )
                         }
+                        positionMarker(series)
                     })
                 })
             },
@@ -213,6 +213,9 @@ export const HCH = () => {
             enableMouseTracking: true,
         },
     })
+    const [legend] = useState({
+        enabled: false,
+    })
 
     if (!points?.pointsList?.length || points.isLoading) return null
 
@@ -229,9 +232,7 @@ export const HCH = () => {
                 rangeSelector,
                 xAxis,
                 yAxis,
-                legend: {
-                    enabled: false,
-                },
+                legend,
                 exporting,
                 plotOptions,
             }}

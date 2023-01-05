@@ -118,6 +118,7 @@ const Right = styled.div`
     flex-direction: column;
     text-align: center;
     height: 400px;
+    align-self: flex-end;
     @media screen and (max-width: 1000px) {
         padding: 32px 0 40px;
     }

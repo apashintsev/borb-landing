@@ -8,6 +8,7 @@ import * as SignalR from '@aspnet/signalr'
 
 import HC_more from 'highcharts/highcharts-more' //module
 HC_more(Highcharts) //init module
+
 ;(function (H) {
     Highcharts.Chart.prototype.callbacks.push(function (chart) {
         H.addEvent(
@@ -25,6 +26,10 @@ HC_more(Highcharts) //init module
                 let delta = e.deltaY
                 const prevent = true
 
+                // console.log('e.chartX', e.chartX)
+                // console.log('chart.plotLeft', chart.plotLeft)
+                // console.log('e.chartY', e.chartY)
+                // console.log('chart.plotTop', chart.plotTop)
                 if (chart.isInsidePlot(e.chartX - chart.plotLeft, e.chartY - chart.plotTop)) {
                     const proportion = (e.chartX - chart.plotLeft) / chart.plotWidth
                     axis.setExtremes(min - proportion * delta * precision, max)
@@ -58,20 +63,50 @@ HC_more(Highcharts) //init module
 })(Highcharts)
 
 function positionMarker(series) {
-    var lastPoint,
-      chart = series.chart,
-      lastPoint = series.points[series.points.length - 1];
-    chart.pulseMarker.animate({
-      x: lastPoint?.plotX - chart?.plotLeft - chart?.spacing[0],
-      y: lastPoint?.plotY + chart?.plotTop + chart?.spacing[2] - 3
-    }, true);
-  }
+    // console.log('<<<<<<<<', series.chart.xAxis[0].getExtremes())
+    // console.log('<<<<<<<<series', series)
+    const chart = series?.chart
+    const lastPoint = series?.points[series?.points?.length - 1]
+    console.log('positionMarker ~ 333333', series?.navigatorSeries?.baseSeries?.xAxis?.dataMax)
+    // console.log('positionMarker ~ 333333', series.navigatorSeries.baseSeries)
+    // console.log('<<<<<<<<points>>>>>>>>', series?.points[series?.points?.length - 1]?.plotX)
+    // console.log('<<<<<<<<data>>>>>>>>', series?.data[series.data.length - 1].plotX)
+    // chart.pulseMarker.animate(
+    //     {
+    //         x: lastPoint?.plotX - chart?.plotLeft - chart?.spacing[0],
+    //         y: lastPoint?.plotY + chart?.plotTop + chart?.spacing[2] - 3,
+    //     },
+    //     true
+    // )
+
+    if (lastPoint?.plotX === series?.data[series.data.length - 1].plotX) {
+        console.log('if ')
+
+        chart?.pulseMarker?.animate(
+            {
+                x: lastPoint.plotX - chart.plotLeft - chart.spacing[0],
+                y: lastPoint.plotY + chart.plotTop + chart.spacing[2] - 3,
+            },
+            true
+        )
+    } else {
+        console.log('else')
+
+        chart?.pulseMarker?.animate(
+            {
+                x: lastPoint.plotX + 1111,
+                y: lastPoint.plotY + 1111,
+            },
+            true
+        )
+    }
+}
 
 export const HCH = () => {
     const { points } = useAppSelector((state) => state.pointsSlice)
     const { currencyPrice, currency, timeframe } = useAppSelector((state) => state.gameSlice)
 
-    console.log('-----------', currencyPrice)
+    // console.log('-----------', currencyPrice)
 
     const [pointsData, setPointsData] = useState([])
     const chartRef = useRef(null)
@@ -112,13 +147,17 @@ export const HCH = () => {
         marginRight: 50,
         events: {
             load: function () {
+                const chart = this
+                chart.pulseMarker = this.renderer
+                    .text("<span class='mgo-widget-call_pulse'></span>", 200, 200, true)
+                    .add()
+
                 // set up the updating of the chart each second
                 // if (this.series.length) return;
-                // this.pulseMarker = this.renderer.text("<span class='mgo-widget-call_pulse'></span>", 200, 200, true).add();
-                
                 const series = this.series[0]
-                // positionMarker(series);
                 console.log('HCH ~ this', this)
+
+                positionMarker(this?.chart?.series?.[0])
 
                 const newConnection = new HubConnectionBuilder()
                     .withUrl(`https://borbfinance.ru/wssrates`, {
@@ -137,73 +176,56 @@ export const HCH = () => {
 
                         const x = new Date().getTime() // current time
 
-                        // console.log('newPrice=========>4')
+                        // console.log('newPrice=========>4', newPrice)
 
-                        if (x - series.data[len - 1].x > timeframe.value * 1000) {
-                            //set marker on last point
-                            // series?.data[len - 1]?.update({
-                            //     marker: {
-                            //         enabled: false,
-                            //     },
-                            // })
+                        // if ((x - series.data[len - 1].x > timeframe.value * 1000)) {
+                        //set marker on last point
+                        // series?.data[len - 1]?.update({
+                        // marker: {
+                        //     enabled: false,
+                        // },
+                        // })
 
-                            // series.points[len - 1].update(
-                            series.data[len - 1].update(
-                                {
-                                    marker: {
-                                        enabled: false,
-                                    },
-                                },
-                                false
-                            )
+                        // series.points[len - 1].update(
+                        // series.data[len - 1].update(
+                        // {
+                        // marker: {
+                        //     enabled: false,
+                        // },
+                        // },
+                        // false
+                        // )
 
-                            series.addPoint(
-                                {
-                                    x: x,
-                                    y: newPrice,
-                                    marker: {
-                                        enabled: false,
-                                        fillColor: '#ff577e',
-                                        radius: 5,
-                                        symbol: '<div class="dot"></div>'
-                                    },
-                                    // dataLabels: {
-                                    //     enabled: true,
-                                    //   useHTML: true,
-                                    //   format: '<div class="dot"></div>',
-                                    //   format: "<div class='mgo-widget-call_pulse'>Hi</div>",
-                                    //   y: 13,
-                                    //   x: 1
-                                    // },
-                                },
-                                true,
-                                true
-                            )
-                        } else {
-                            series.data[len - 1].update(
-                                {
-                                    y: newPrice,
-                                    marker: {
-                                        enabled: false,
-                                        fillColor: '#ff577e',
-                                        radius: 5,
-                                        symbol: '<div class="dot"></div>'
-                                    },
-                                    // dataLabels: {
-                                    //     enabled: true,
-                                    //   useHTML: true,
-                                    //   format: '<div class="dot"></div>',
-                                    //   format: "<div class='mgo-widget-call_pulse'>Hi</div>",
-                                    //   y: 19,
-                                    //   x: 19
-                                    // },
-                                    // className: 'customClass',
-                                },
-                                true,
-                                true
-                            )
-                        }
-                        // positionMarker(series);
+                        series.addPoint(
+                            {
+                                x: x,
+                                y: newPrice + Math.random(),
+                                // marker: {
+                                //     enabled: true,
+                                //     fillColor: '#ff577e',
+                                //     radius: 5,
+                                // },
+                                // className: 'dot',
+                            },
+                            true,
+                            true
+                        )
+                        // } else {
+                        //     series.data[len - 1].update(
+                        //         {
+                        //             y: newPrice,
+                        //             marker: {
+                        //                 enabled: true,
+                        //                 fillColor: '#ff577e',
+                        //                 radius: 5,
+                        //             },
+                        //             className: 'dot',
+                        //         },
+                        //         true,
+                        //         true
+                        //     )
+                        // }
+                        positionMarker(series)
                     })
                 })
             },
@@ -219,6 +241,26 @@ export const HCH = () => {
     const [xAxis] = useState({
         type: 'datetime',
         tickPixelInterval: 150,
+
+        // minPadding: 0.1,
+        // maxPadding: 0.1,
+        // ordinal: false,
+        // events: {
+        //     setExtremes: function (e) {
+        //         if (e.trigger) {
+        //             e.preventDefault()
+        //             const navigator = this.chart.xAxis[1]
+        //             let { min, max } = e
+        //             const range = navigator.max - navigator.min
+        //             console.log('HCH ~ e---------<<<<<<<<<', 
+                    // this.series[0].points[series.points.length - 1].plotX === this.series[0]?.data?.[series?.data?.length - 1]?.plotX
+                    // )
+                    // if (max === navigator.max) max += 0.1 * range
+                    // if (min === navigator.min) min -= 0.1 * range
+                    // this.setExtremes(min, max)
+                // }
+            // },
+        // },
     })
     const [yAxis] = useState({
         opposite: false,

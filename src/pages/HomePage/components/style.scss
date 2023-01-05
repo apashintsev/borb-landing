@@ -27,7 +27,6 @@
 @keyframes blinker {
     50% {
         opacity: 0.2;
-        // transform: scale(0.5);
     }
 }
 
@@ -61,15 +60,12 @@
 @keyframes blinking {
     0% {
         opacity: 0.2;
-        // transform: scale(0.1);
     }
     50% {
         opacity: 1;
-        // transform: scale(1);
     }
     100% {
         opacity: 0.2;
-        // transform: scale(0.1);
     }
 }
 
@@ -77,9 +73,10 @@
     height: 7px;
     width: 7px;
     background-color: #00cc78;
+    background-color: #3fe7be;
     border-radius: 100%;
     position: absolute;
-    left: 99px;
+    left: 97px;
     top: 0;
     bottom: 0;
     margin: auto 0;
