@@ -60,18 +60,18 @@ HC_more(Highcharts) //init module
 
 function positionMarker(series) {
     const chart = series?.chart
-    const lastPoint = series?.points[series?.points?.length - 1]
+    const lastPoint = series?.points?.[series?.points?.length - 1]
 
-    if (lastPoint?.plotX === series?.data[series.data.length - 1].plotX) {
+    if (lastPoint?.plotX === series?.data?.[series?.data?.length - 1]?.plotX) {
         chart?.pulseMarker?.animate(
             {
-                x: lastPoint.plotX - chart.plotLeft - chart.spacing[0],
-                y: lastPoint.plotY + chart.plotTop + chart.spacing[2] - 3,
+                x: 508,
+                y: lastPoint?.plotY + chart?.plotTop + chart?.spacing[2] - 3,
             },
             true
-        )
-    } else {
-        chart?.pulseMarker?.animate(
+            )
+        } else {
+            chart?.pulseMarker?.animate(
             {
                 x: lastPoint.plotX + 1111,
                 y: lastPoint.plotY + 1111,
@@ -121,19 +121,18 @@ export const HCH = () => {
 
     const [chart] = useState({
         type: 'spline',
-        marginRight: 50,
+        // marginRight: 50,
         events: {
             load: function () {
-                const chart = this
-                chart.pulseMarker = this.renderer
+                this.pulseMarker = this.renderer
                     .text("<span class='mgo-widget-call_pulse'></span>", 200, 200, true)
                     .add()
 
                 // set up the updating of the chart each second
-                const series = this.series[0]
+                const series = this.series?.[0]
                 // console.log('HCH ~ this', this)
 
-                positionMarker(this?.chart?.series?.[0])
+                positionMarker(series)
 
                 const newConnection = new HubConnectionBuilder()
                     .withUrl(`https://borbfinance.ru/wssrates`, {
@@ -154,7 +153,7 @@ export const HCH = () => {
 
                         // console.log('newPrice=========>', newPrice)
 
-                        if (x - series.data[len - 1].x > timeframe.value * 1000) {
+                        if (x - series?.data?.[len - 1]?.x > timeframe?.value * 1000) {
                             series.addPoint(
                                 {
                                     x: x,
@@ -164,7 +163,7 @@ export const HCH = () => {
                                 true
                             )
                         } else {
-                            series.data[len - 1].update(
+                            series?.data?.[len - 1].update(
                                 {
                                     y: newPrice,
                                 },
@@ -221,7 +220,7 @@ export const HCH = () => {
 
     return (
         <HighchartsReact
-            constructorType={'stockChart'}
+            constructorType="stockChart"
             allowChartUpdate={true}
             highcharts={Highcharts}
             ref={chartRef}

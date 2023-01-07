@@ -19,8 +19,8 @@ export const Chart = () => {
             getPoints({
                 currency: currency,
                 timeframe: timeframe.value,
-                pageNumber: 3,
-                pageSize: 500,
+                pageNumber: 14,
+                pageSize: 100,
             })
         )
     }, [currency, dispatch, timeframe.value])
