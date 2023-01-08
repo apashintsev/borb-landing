@@ -69,9 +69,9 @@ function positionMarker(series) {
                 y: lastPoint?.plotY + chart?.plotTop + chart?.spacing[2] - 3,
             },
             true
-            )
-        } else {
-            chart?.pulseMarker?.animate(
+        )
+    } else {
+        chart?.pulseMarker?.animate(
             {
                 x: lastPoint.plotX + 1111,
                 y: lastPoint.plotY + 1111,
@@ -150,13 +150,14 @@ export const HCH = () => {
                         const len = series?.data.length
 
                         const x = new Date().getTime() // current time
+                        const timeframeInMs = timeframe?.value * 1000 // timeframe in milliseconds
 
                         // console.log('newPrice=========>', newPrice)
 
-                        if (x - series?.data?.[len - 1]?.x > timeframe?.value * 1000) {
+                        if (x - series?.data?.[len - 1]?.x > timeframeInMs) {
                             series.addPoint(
                                 {
-                                    x: x,
+                                    x: x - (x % timeframeInMs),
                                     y: newPrice,
                                 },
                                 true,
