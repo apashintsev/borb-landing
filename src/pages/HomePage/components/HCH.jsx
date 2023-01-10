@@ -65,7 +65,7 @@ function positionMarker(series) {
     if (lastPoint?.plotX === series?.data?.[series?.data?.length - 1]?.plotX) {
         chart?.pulseMarker?.animate(
             {
-                x: 508,
+                x: chart?.chartWidth - chart?.marginRight,
                 y: lastPoint?.plotY + chart?.plotTop + chart?.spacing[2] - 3,
             },
             true
