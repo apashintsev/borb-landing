@@ -94,8 +94,11 @@ export const HCH = () => {
         setPointsData(
             points?.pointsList
                 .map((point, index) => {
+                    const x = new Date(point.timeStamp).getTime()
+                    const timeframeInMs = timeframe?.value * 1000 // timeframe in milliseconds
+
                     return {
-                        x: new Date(point.timeStamp).getTime(),
+                        x: x - (x % timeframeInMs),
                         y: point.value,
                     }
                 })
@@ -154,10 +157,18 @@ export const HCH = () => {
 
                         // console.log('newPrice=========>', newPrice)
 
-                        if (x - series?.data?.[len - 1]?.x > timeframeInMs) {
-                            series.addPoint(
+                        if (x - series?.data?.[len - 2]?.x > timeframeInMs) {
+                            series?.data?.[len - 1].update(
                                 {
                                     x: x - (x % timeframeInMs),
+                                    y: newPrice,
+                                },
+                                true,
+                                true
+                            )
+                            series.addPoint(
+                                {
+                                    x,
                                     y: newPrice,
                                 },
                                 true,
@@ -166,6 +177,7 @@ export const HCH = () => {
                         } else {
                             series?.data?.[len - 1].update(
                                 {
+                                    x,
                                     y: newPrice,
                                 },
                                 true,
