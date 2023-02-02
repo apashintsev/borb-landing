@@ -5,7 +5,7 @@ import { useAppDispatch, useAppSelector } from '../../hooks/redux'
 import { gameSlice } from '../../store/reducers/gameSlice'
 import SelectCurrency from '../../components/SelectCurrency/SelectCurrency'
 import { BetCard } from './components/BetCard'
-import { Chart } from './components/Chart'
+import { ChartBlock } from './components/ChartBlock'
 import { History } from './components/History'
 import { getQueryVariable } from '../../lib/sharedFunctions'
 import { regexEthAddress } from '../../lib/data'
@@ -29,7 +29,7 @@ const Home = () => {
             <div className="container">
                 <SelectCurrency />
                 <Row>
-                    <Chart />
+                    <ChartBlock />
                     <BetCard />
                 </Row>
                 <History />

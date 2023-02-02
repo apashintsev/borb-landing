@@ -1,18 +1,20 @@
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useAppDispatch, useAppSelector } from '../../../hooks/redux'
 import { useUpdatePrices } from '../../../hooks/useUpdatePrices'
-import { AmChart5 } from './AmChart5'
-import { AmChart } from './AmChart'
 import { Left } from './main'
 import { Timeframes } from './Timeframes'
 import { getPoints } from '../../../store/api/prices'
-import { HCH } from './HCH'
-import './style.scss';
+import './style.scss'
+import { Chart } from './BetChart/BetChartComponent'
 
-export const Chart = () => {
+export const ChartBlock = () => {
     useUpdatePrices()
-    const { currencyPrice, currency, timeframe } = useAppSelector((state) => state.gameSlice)
+    const { currencyPrice, currency, timeframe, activeBet } = useAppSelector((state) => state.gameSlice)
+    const { themeName } = useAppSelector((state) => state.appSettings)
+    const { points } = useAppSelector((state) => state.chartSlice)
     const dispatch = useAppDispatch()
+
+    const chartRef = useRef<Chart>(null)
 
     useEffect(() => {
         dispatch(
@@ -25,6 +27,10 @@ export const Chart = () => {
         )
     }, [currency, dispatch, timeframe.value])
 
+    useEffect(() => {
+        chartRef.current?.bet();
+    }, [activeBet])
+
     return (
         <Left>
             <div className="left_row">
@@ -32,11 +38,8 @@ export const Chart = () => {
                 <Timeframes />
             </div>
             <div className="chart">
-                {/* <AmChart5 /> */}
-                {/* <AmChart /> */}
-                <HCH />
+                <Chart ref={chartRef} points={points.pointsList} timeframe={timeframe.value} theme={themeName} />
             </div>
-            {/* <AdvancedChart widgetProps={{ theme: 'dark' }} />             */}
         </Left>
     )
 }

@@ -16,6 +16,7 @@ export const initialState = {
     currency: allowedCurrencies[0],
     currencyPrice: 25000 as number,
     isPopupOpen: false,
+    activeBet: {} as BetVm,
     closedBet: {} as BetVm,
 }
 export const gameSlice = createSlice({
@@ -51,6 +52,9 @@ export const gameSlice = createSlice({
         },
         setClosedBet(state, action: PayloadAction<BetVm>) {
             state.closedBet = action.payload
+        },
+        setActiveBet(state, action: PayloadAction<BetVm>) {
+            state.activeBet = action.payload
         },
     },
 })

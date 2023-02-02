@@ -1,6 +1,7 @@
 import { combineReducers, configureStore } from '@reduxjs/toolkit'
 import web3Reducer from '../store/reducers/web3Slice'
 import appSettings from './reducers/appSettingsSlice'
+import chartSlice from './reducers/chartSlice'
 import pointsSlice from './reducers/chartSlice'
 import gameSlice from './reducers/gameSlice'
 import historySlice from './reducers/historySlice'
@@ -15,6 +16,7 @@ const rootReducer = combineReducers({
     supplySlice,
     historySlice,
     referalRewardsSlice,
+    chartSlice,
 })
 
 export const setupStore = () => {

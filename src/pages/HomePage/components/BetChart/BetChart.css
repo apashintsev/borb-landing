@@ -1,0 +1,48 @@
+.BetChartTooltip {
+    position: absolute;
+    user-select: none;
+    pointer-events: none;
+    transition: all 300ms;
+    border-radius: 8px;
+    padding: 16px;
+    width: max-content;
+    background-color: white;
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+
+.BetChartTooltip.dark {
+    background-color: rgba(0,0,0,0.5);
+    box-shadow: 0 10px 15px -3px rgb(255 255 255 / 0.1), 0 4px 6px -4px rgb(255 255 255 / 0.1);
+}
+
+.BetChartTooltip .content {
+    width: 240px;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.BetChartTooltip .content .line-1 {
+    display: flex;
+    justify-content: space-between;
+}
+
+.BetChartTooltip .content .line-2 {
+    display: flex;
+    margin-top: 12px;
+}
+
+.BetChartTooltip .content .grey {
+    color: #999999;
+}
+
+.BetChartTooltip .content .value {
+    margin-left: 4px;
+}
+
+.BetChartTooltip .content .text {
+    color: black;
+}
+
+.BetChartTooltip.dark .content .text {
+    color: white;
+}
